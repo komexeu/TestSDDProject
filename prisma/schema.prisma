@@ -1,0 +1,38 @@
+// Prisma schema for 商品管理
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id          String         @id @default(uuid())
+  name        String         @unique
+  description String
+  price       Int // 新台幣整數，>0
+  stock       Int            @default(0) // 庫存數量，>=0
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  logs        InventoryLog[]
+}
+
+model InventoryLog {
+  id        String   @id @default(uuid())
+  product   Product  @relation(fields: [productId], references: [id])
+  productId String
+  before    Int
+  after     Int
+  delta     Int
+  reason    String
+  operator  String
+  createdAt DateTime @default(now())
+}
+
+model Admin {
+  id   String @id @default(uuid())
+  name String
+}

@@ -1,0 +1,124 @@
+openapi: 3.0.3
+info:
+  title: 點餐系統 API
+  version: 1.0.0
+servers:
+  - url: /api
+paths:
+  /orders:
+    post:
+      summary: 用戶送出訂單
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '201':
+          description: 訂單建立成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+  /orders/{orderId}/status:
+    get:
+      summary: 查詢訂單狀態
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 狀態查詢成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderStatus'
+  /orders/{orderId}/confirm:
+    post:
+      summary: 櫃檯確認訂單
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 訂單已確認
+  /orders/{orderId}/cancel:
+    post:
+      summary: 用戶或櫃檯取消訂單
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 訂單已取消
+  /orders/{orderId}/complete:
+    post:
+      summary: 櫃檯標記餐點完成
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 訂單已完成
+components:
+  schemas:
+    CreateOrderRequest:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Item'
+    Order:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        status:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Item'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    Item:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        quantity:
+          type: integer
+        price:
+          type: integer
+    OrderStatus:
+      type: object
+      properties:
+        orderId:
+          type: string
+        status:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
