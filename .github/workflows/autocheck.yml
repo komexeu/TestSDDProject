@@ -6,19 +6,23 @@ on:
       - master
 
 jobs:
-  issue-bot:
+  set-matrix:
     runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set_matrix.outputs.matrix }}
     steps:
       - uses: actions/checkout@v3
       - name: Find all tasks.md
-        id: set-matrix
+        id: set_matrix
         run: |
           files=$(find specs -type f -name 'tasks.md' | jq -R . | jq -s .)
           echo "matrix={\"tasks\":$files}" >> $GITHUB_OUTPUT
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
+
+  issue-bot:
+    needs: set-matrix
+    runs-on: ubuntu-latest
     strategy:
-      matrix: ${{ fromJson(steps.set-matrix.outputs.matrix) }}
+      matrix: ${{ fromJson(needs.set-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v3
       - name: Issue Bot (all specs)
