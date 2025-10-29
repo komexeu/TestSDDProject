@@ -21,4 +21,4 @@ jobs:
       - name: Create issues from all tasks.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: node scripts/create-issues-from-tasks.js
+        run: node scripts/create-issues-from-tasks.cjs
