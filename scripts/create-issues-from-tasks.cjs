@@ -64,7 +64,9 @@ function main() {
     const mainIssueTitle = `[${featureLabel}] Feature`;
     let mainIssue = existingIssues.find(i => i.title === mainIssueTitle && i.labels.some(l => l.name === featureLabel));
     let mainIssueNumber = mainIssue ? mainIssue.number : null;
-    if (!mainIssueNumber) {
+    if (mainIssueNumber) {
+      console.log(`Main issue already exists: ${mainIssueTitle} (#${mainIssueNumber})`);
+    } else {
       mainIssueNumber = createIssue(mainIssueTitle, `Auto-generated main issue for ${spec}\n\n此 issue 代表 ${spec} 的主功能，所有子任務請見 sub-issues。`, [...LABELS, featureLabel]);
       console.log(`Created main issue: ${mainIssueTitle} (#${mainIssueNumber})`);
       // 重新取得 existingIssues 以便 reference
@@ -76,7 +78,10 @@ function main() {
     for (const task of tasks) {
       const subIssueTitle = `[${featureLabel}] ${task}`;
       const exists = existingIssues.some(i => i.title === subIssueTitle && i.labels.some(l => l.name === featureLabel));
-      if (exists) continue;
+      if (exists) {
+        console.log(`Sub issue already exists: ${subIssueTitle}`);
+        continue;
+      }
       const subBody = `Parent: #${mainIssueNumber}\n\nAuto-generated from ${spec}/tasks.md`;
       createIssue(subIssueTitle, subBody, [...LABELS, featureLabel]);
       console.log(`Created sub-issue: ${subIssueTitle}`);
