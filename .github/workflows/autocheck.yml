@@ -1,0 +1,29 @@
+name: Auto Check Tasks
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  check-tasks:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: main
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Install dependencies
+        run: npm install
+      - name: 自動勾選任務（範例：T004，請依實際需求調整）
+        run: node scripts/check-task.js T004
+      - name: Commit & Push
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add specs/003-inventory-feature/tasks.md
+          git commit -m 'ci: 自動勾選已完成任務'
+          git push

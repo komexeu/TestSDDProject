@@ -13,12 +13,12 @@
 
 **Language/Version**: TypeScript (Node.js)  
 **Primary Dependencies**: Hono (API)、Prisma (ORM)、Jest（測試）  
-**Storage**: SQLite 或 Cloudflare D1  
-**Testing**: Jest  
+**Storage**: PostgreSQL（開發與測試皆建議使用 PostgreSQL，確保一致性）  
+**Testing**: Jest（資料庫請以 PostgreSQL 實際運作）  
 **Target Platform**: Node.js API Server 或 Cloudflare Workers
 **Project Type**: 單一專案（API 專案）  
 **Performance Goals**: 查詢/異動 API 反應時間 <1 秒，禁止超賣  
-**Constraints**: 僅管理員可操作、商品資料需一致、所有異動需有紀錄  
+**Constraints**: 僅管理員可操作、商品資料需一致、所有異動需有紀錄。測試與開發環境務必使用 PostgreSQL。  
 **Scale/Scope**: 初期商品數量 <1000，並發調整/銷售 <100 筆/秒
 
 ## Constitution Check

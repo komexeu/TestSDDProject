@@ -1,4 +1,7 @@
+
 # 資料模型：後台商品管理
+
+**說明**：本文件由 `/speckit.data-model` 指令自動產生。
 
 **建立日期**：2025-10-22
 **分支**：002-admin-product-management

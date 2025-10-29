@@ -1,4 +1,7 @@
+
 # 實作計畫：點餐系統流程
+
+**說明**：本文件由 `/speckit.plan` 指令自動產生。
 
 **分支**：`001-order-system-flow` | **日期**：2025-10-21 | **規格**：[spec.md](./spec.md)
 **輸入**：功能規格來自 `/specs/001-order-system-flow/spec.md`

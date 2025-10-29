@@ -1,63 +1,61 @@
-# Feature Specification: [FEATURE NAME]
 
-**Feature Branch**: `[###-feature-name]`  
-**Created**: [DATE]  
-**Status**: Draft  
-**Input**: User description: "$ARGUMENTS"
+# 功能規格說明書：[功能名稱]
 
-## User Scenarios & Testing *(mandatory)*
+**說明**：本範本由 `/speckit.spec` 指令自動產生。
+
+**功能分支**：`[###-feature-name]`  
+**建立日期**：[日期]  
+**狀態**：草稿  
+**輸入描述**：「$ARGUMENTS」
+
+## 使用者情境與測試（必填）
 
 <!--
-  IMPORTANT: User stories should be PRIORITIZED as user journeys ordered by importance.
-  Each user story/journey must be INDEPENDENTLY TESTABLE - meaning if you implement just ONE of them,
-  you should still have a viable MVP (Minimum Viable Product) that delivers value.
+  重要說明：User Story（使用者故事）必須依照重要性排序。
+  每個故事都必須「可獨立測試」——也就是說，即使只實作其中一個，也能形成有價值的 MVP（最小可行產品）。
   
-  Assign priorities (P1, P2, P3, etc.) to each story, where P1 is the most critical.
-  Think of each story as a standalone slice of functionality that can be:
-  - Developed independently
-  - Tested independently
-  - Deployed independently
-  - Demonstrated to users independently
+  請為每個故事標註優先順序（P1、P2、P3...），P1 為最關鍵。
+  每個故事都應視為可獨立開發、測試、部署、展示的功能切片。
 -->
 
-### User Story 1 - [Brief Title] (Priority: P1)
+### 使用者故事 1 - [簡要標題]（優先順序：P1）
 
-[Describe this user journey in plain language]
+[以白話描述此使用者情境]
 
-**Why this priority**: [Explain the value and why it has this priority level]
+**優先原因**：[說明此故事的價值與排序理由]
 
-**Independent Test**: [Describe how this can be tested independently - e.g., "Can be fully tested by [specific action] and delivers [specific value]"]
+**獨立測試方式**：[說明如何獨立驗證此故事，例如：「可透過[具體操作]完整測試，並產生[具體價值]」]
 
-**Acceptance Scenarios**:
+**驗收情境**：
 
-1. **Given** [initial state], **When** [action], **Then** [expected outcome]
-2. **Given** [initial state], **When** [action], **Then** [expected outcome]
-
----
-
-### User Story 2 - [Brief Title] (Priority: P2)
-
-[Describe this user journey in plain language]
-
-**Why this priority**: [Explain the value and why it has this priority level]
-
-**Independent Test**: [Describe how this can be tested independently]
-
-**Acceptance Scenarios**:
-
-1. **Given** [initial state], **When** [action], **Then** [expected outcome]
+1. **前提**：[初始狀態]，**當**[動作]，**則**[預期結果]
+2. **前提**：[初始狀態]，**當**[動作]，**則**[預期結果]
 
 ---
 
-### User Story 3 - [Brief Title] (Priority: P3)
+### 使用者故事 2 - [簡要標題]（優先順序：P2）
 
-[Describe this user journey in plain language]
+[以白話描述此使用者情境]
 
-**Why this priority**: [Explain the value and why it has this priority level]
+**優先原因**：[說明此故事的價值與排序理由]
 
-**Independent Test**: [Describe how this can be tested independently]
+**獨立測試方式**：[說明如何獨立驗證此故事]
 
-**Acceptance Scenarios**:
+**驗收情境**：
+
+1. **前提**：[初始狀態]，**當**[動作]，**則**[預期結果]
+
+---
+
+### 使用者故事 3 - [簡要標題]（優先順序：P3）
+
+[以白話描述此使用者情境]
+
+**優先原因**：[說明此故事的價值與排序理由]
+
+**獨立測試方式**：[說明如何獨立驗證此故事]
+
+**驗收情境**：
 
 1. **Given** [initial state], **When** [action], **Then** [expected outcome]
 
