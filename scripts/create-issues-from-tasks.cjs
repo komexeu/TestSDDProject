@@ -1,7 +1,8 @@
 // 解析所有 specs/*/tasks.md，將未勾選的 checklist 轉為 GitHub issue
+
 const fs = require('fs');
-const { execSync } = require('child_process');
 const path = require('path');
+const { execSync } = require('child_process');
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 if (!GITHUB_TOKEN) {
@@ -9,37 +10,78 @@ if (!GITHUB_TOKEN) {
   process.exit(1);
 }
 
-// 取得所有 tasks.md 路徑
-const specsDir = path.join(__dirname, '../specs');
-const featureDirs = fs.readdirSync(specsDir).filter(f => fs.statSync(path.join(specsDir, f)).isDirectory());
-let allTasks = [];
+const SPECS_DIR = path.join(__dirname, '../specs');
+const TASKS_MD = 'tasks.md';
+const LABELS = ['speckit', 'auto-task'];
 
-featureDirs.forEach(feature => {
-  const tasksPath = path.join(specsDir, feature, 'tasks.md');
-  if (!fs.existsSync(tasksPath)) return;
-  const content = fs.readFileSync(tasksPath, 'utf8');
-  // 只抓未勾選的 checklist
-  const matches = [...content.matchAll(/^- \[ \] (.+)$/gm)];
-  matches.forEach(m => {
-    allTasks.push({
-      feature,
-      title: m[1].trim(),
-      body: `來源：specs/${feature}/tasks.md\n\n${m[1].trim()}`
-    });
-  });
-});
-
-if (allTasks.length === 0) {
-  console.log('No new tasks to create as issues.');
-  process.exit(0);
+function getAllSpecs() {
+  return fs.readdirSync(SPECS_DIR).filter(f => fs.statSync(path.join(SPECS_DIR, f)).isDirectory());
 }
 
-// 建立 issue
-allTasks.forEach(task => {
-  const cmd = `gh issue create --title "${task.title}" --body "${task.body}" --label speckit,auto-task`;
-  console.log(`Creating issue: ${task.title}`);
-  execSync(cmd, {
-    stdio: 'inherit',
-    env: { ...process.env, GITHUB_TOKEN }
-  });
-});
+function parseTasksMd(filePath) {
+  const content = fs.readFileSync(filePath, 'utf8');
+  const lines = content.split('\n');
+  const tasks = [];
+  for (const line of lines) {
+    const match = line.match(/^[-*] \[ \] (.+)$/);
+    if (match) {
+      tasks.push(match[1].trim());
+    }
+  }
+  return tasks;
+}
+
+function getExistingIssues() {
+  const out = execSync('gh issue list --state all --json title,number,body,labels', { encoding: 'utf8' });
+  return JSON.parse(out);
+}
+
+function ensureLabel(label) {
+  try {
+    execSync(`gh label create "${label}" --force`, { stdio: 'ignore' });
+  } catch {}
+}
+
+function createIssue(title, body, labels) {
+  const labelArgs = labels.map(l => `--label "${l}"`).join(' ');
+  const cmd = `gh issue create --title "${title}" --body "${body}" ${labelArgs}`;
+  const out = execSync(cmd, { encoding: 'utf8' });
+  const match = out.match(/https:\/\/github.com\/[^/]+\/[^/]+\/issues\/(\d+)/);
+  return match ? parseInt(match[1], 10) : null;
+}
+
+function main() {
+  const specs = getAllSpecs();
+  const existingIssues = getExistingIssues();
+  for (const label of LABELS) ensureLabel(label);
+
+  for (const spec of specs) {
+    const featureLabel = spec;
+    ensureLabel(featureLabel);
+    const tasksPath = path.join(SPECS_DIR, spec, TASKS_MD);
+    if (!fs.existsSync(tasksPath)) continue;
+    // 1. 主 issue: 以 spec 名稱為標題
+    const mainIssueTitle = `[${featureLabel}] Feature`;
+    let mainIssue = existingIssues.find(i => i.title === mainIssueTitle && i.labels.some(l => l.name === featureLabel));
+    let mainIssueNumber = mainIssue ? mainIssue.number : null;
+    if (!mainIssueNumber) {
+      mainIssueNumber = createIssue(mainIssueTitle, `Auto-generated main issue for ${spec}\n\n此 issue 代表 ${spec} 的主功能，所有子任務請見 sub-issues。`, [...LABELS, featureLabel]);
+      console.log(`Created main issue: ${mainIssueTitle} (#${mainIssueNumber})`);
+      // 重新取得 existingIssues 以便 reference
+      existingIssues.push({ title: mainIssueTitle, number: mainIssueNumber, labels: [{ name: featureLabel }] });
+    }
+
+    // 2. sub issue: checklist
+    const tasks = parseTasksMd(tasksPath);
+    for (const task of tasks) {
+      const subIssueTitle = `[${featureLabel}] ${task}`;
+      const exists = existingIssues.some(i => i.title === subIssueTitle && i.labels.some(l => l.name === featureLabel));
+      if (exists) continue;
+      const subBody = `Parent: #${mainIssueNumber}\n\nAuto-generated from ${spec}/tasks.md`;
+      createIssue(subIssueTitle, subBody, [...LABELS, featureLabel]);
+      console.log(`Created sub-issue: ${subIssueTitle}`);
+    }
+  }
+}
+
+main();
