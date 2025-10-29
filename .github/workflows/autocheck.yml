@@ -15,7 +15,7 @@ jobs:
       - name: Find all tasks.md
         id: set_matrix
         run: |
-          files=$(find specs -type f -name 'tasks.md' | jq -R . | jq -s .)
+          files=$(find specs -type f -name 'tasks.md' | jq -R . | jq -c -s .)
           echo "matrix={\"tasks\":$files}" >> $GITHUB_OUTPUT
 
   issue-bot:
