@@ -19,7 +19,7 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: 自動勾選任務（範例：T004，請依實際需求調整）
-        run: node scripts/check-task.js T004
+        run: node scripts/check-task.js
       - name: Commit & Push
         run: |
           git config --global user.name 'github-actions[bot]'
