@@ -32,14 +32,14 @@ function parseTasksMd(filePath) {
 }
 
 function getExistingIssues() {
-  const out = execSync('gh issue list --state all --json title,number,body,labels', { encoding: 'utf8' });
+  const out = execSync('gh issue list --state all --limit 9000 --json title,number,body,labels', { encoding: 'utf8' });
   return JSON.parse(out);
 }
 
 function ensureLabel(label) {
   try {
     execSync(`gh label create "${label}" --force`, { stdio: 'ignore' });
-  } catch {}
+  } catch { }
 }
 
 function createIssue(title, body, labels) {
@@ -75,16 +75,21 @@ function main() {
 
     // 2. sub issue: checklist
     const tasks = parseTasksMd(tasksPath);
-    for (const task of tasks) {
-      const subIssueTitle = `[${featureLabel}] ${task}`;
-      const exists = existingIssues.some(i => i.title === subIssueTitle && i.labels.some(l => l.name === featureLabel));
-      if (exists) {
-        console.log(`Sub issue already exists: ${subIssueTitle}`);
-        continue;
+    if (!mainIssueNumber) {
+      console.log(`Skip sub-issues for ${spec} because main issue does not exist.`);
+    } else {
+      for (const task of tasks) {
+        const subIssueTitle = `[${featureLabel}] ${task}`;
+        const exists = existingIssues.some(i => i.title === subIssueTitle && i.labels.some(l => l.name === featureLabel));
+        if (exists) {
+          console.log(`[${featureLabel}] Sub issue already exists: ${subIssueTitle}`);
+        } else {
+          console.log(`[${featureLabel}] Creating sub issue: ${subIssueTitle}`);
+          const subBody = `Parent: #${mainIssueNumber}\n\nAuto-generated from ${spec}/tasks.md`;
+          createIssue(subIssueTitle, subBody, [...LABELS, featureLabel]);
+          console.log(`Created sub-issue: ${subIssueTitle}`);
+        }
       }
-      const subBody = `Parent: #${mainIssueNumber}\n\nAuto-generated from ${spec}/tasks.md`;
-      createIssue(subIssueTitle, subBody, [...LABELS, featureLabel]);
-      console.log(`Created sub-issue: ${subIssueTitle}`);
     }
   }
 }
