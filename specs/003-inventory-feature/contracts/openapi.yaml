@@ -1,0 +1,111 @@
+openapi: 3.0.3
+info:
+  title: 商品庫存管理 API
+  version: 1.0.0
+  description: 商品庫存查詢、調整、異動紀錄、銷售自動扣庫存
+servers:
+  - url: /api
+paths:
+  /inventory/{productId}:
+    get:
+      summary: 查詢單一商品庫存
+      parameters:
+        - in: path
+          name: productId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 查詢成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  productId:
+                    type: string
+                  stock:
+                    type: integer
+        '404':
+          description: 查無商品
+  /inventory/{productId}/adjust:
+    post:
+      summary: 手動調整商品庫存
+      parameters:
+        - in: path
+          name: productId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                newStock:
+                  type: integer
+                reason:
+                  type: string
+      responses:
+        '200':
+          description: 調整成功
+        '400':
+          description: 輸入錯誤（如負數）
+        '404':
+          description: 查無商品
+  /inventory/{productId}/logs:
+    get:
+      summary: 查詢商品庫存異動紀錄
+      parameters:
+        - in: path
+          name: productId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 查詢成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    before:
+                      type: integer
+                    after:
+                      type: integer
+                    delta:
+                      type: integer
+                    reason:
+                      type: string
+                    operator:
+                      type: string
+                    createdAt:
+                      type: string
+                      format: date-time
+  /inventory/sale:
+    post:
+      summary: 銷售自動扣庫存
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                productId:
+                  type: string
+                quantity:
+                  type: integer
+      responses:
+        '200':
+          description: 扣庫存成功
+        '400':
+          description: 庫存不足或輸入錯誤
+        '404':
+          description: 查無商品

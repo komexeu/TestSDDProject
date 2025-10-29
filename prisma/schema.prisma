@@ -1,0 +1,59 @@
+// Prisma schema for 商品管理
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  /// 商品唯一編號（純數字字串）
+  id          String         @id @default(uuid())
+  /// 商品名稱（唯一）
+  name        String         @unique
+  /// 商品識別代號，可重複
+  code        String?
+  /// 商品描述
+  description String
+  /// 售價（新台幣整數，>0）
+  price       Int
+  /// 庫存數量（>=0）
+  stock       Int            @default(0)
+  /// 建立時間
+  createdAt   DateTime       @default(now())
+  /// 更新時間
+  updatedAt   DateTime       @updatedAt
+  /// 商品庫存異動紀錄
+  logs        InventoryLog[]
+}
+
+model InventoryLog {
+  /// 異動紀錄唯一編號
+  id        String   @id @default(uuid())
+  /// 關聯商品
+  product   Product  @relation(fields: [productId], references: [id])
+  /// 商品 id
+  productId String
+  /// 異動前庫存
+  before    Int
+  /// 異動後庫存
+  after     Int
+  /// 異動數量（after-before）
+  delta     Int
+  /// 異動原因
+  reason    String
+  /// 操作者
+  operator  String
+  /// 異動時間
+  createdAt DateTime @default(now())
+}
+
+model Admin {
+  /// 管理員唯一編號
+  id   String @id @default(uuid())
+  /// 管理員名稱
+  name String
+}

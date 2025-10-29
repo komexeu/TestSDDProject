@@ -1,23 +1,25 @@
-# [PROJECT NAME] Development Guidelines
 
-Auto-generated from all feature plans. Last updated: [DATE]
+# [專案名稱] 開發指引
 
-## Active Technologies
-[EXTRACTED FROM ALL PLAN.MD FILES]
+自所有功能計畫自動彙整。最後更新：[日期]
 
-## Project Structure
+## 使用技術
+[自所有 plan.md 自動擷取]
+
+## 專案結構
 ```
-[ACTUAL STRUCTURE FROM PLANS]
+[依各功能計畫彙整實際結構]
 ```
 
-## Commands
-[ONLY COMMANDS FOR ACTIVE TECHNOLOGIES]
+## 指令
+[僅列出目前專案實際用到的技術指令]
 
-## Code Style
-[LANGUAGE-SPECIFIC, ONLY FOR LANGUAGES IN USE]
+## 程式碼風格
+[僅針對專案實際語言列出規範]
 
-## Recent Changes
-[LAST 3 FEATURES AND WHAT THEY ADDED]
+## 最近異動
+[最近三個功能及其新增內容]
 
+<!-- 可手動補充區塊 -->
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->

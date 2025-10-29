@@ -1,0 +1,54 @@
+name: Auto Check Tasks
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  check-tasks:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: main
+      - name: Find all tasks.md
+        id: set-matrix
+        run: |
+          files=$(find specs -type f -name 'tasks.md' | jq -R . | jq -s .)
+          echo "matrix={\"tasks\":$files}" >> $GITHUB_OUTPUT
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Install dependencies
+        run: npm install
+      - name: 自動勾選任務（範例：T004，請依實際需求調整）
+        run: node scripts/check-task.js
+      - name: Commit & Push
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add specs/003-inventory-feature/tasks.md
+          git commit -m 'ci: 自動勾選已完成任務'
+          git push
+
+  issue-bot:
+    needs: check-tasks
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJson(needs.check-tasks.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: main
+      - name: Issue Bot (all specs)
+        uses: imjohnbo/issue-bot@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          file: ${{ matrix.tasks }}
+          labels: "speckit,auto-task"
+          title: "自動產生任務：{{text}}"
+          body: "來源：tasks.md\n\n{{text}}"
