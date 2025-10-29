@@ -78,6 +78,26 @@ function main() {
     if (!mainIssueNumber) {
       console.log(`Skip sub-issues for ${spec} because main issue does not exist.`);
     } else {
+      // 先建立一個 set 方便比對
+      const taskSet = new Set(tasks);
+      // 先處理現有 sub issue 是否有已被移除的
+      for (const issue of existingIssues) {
+        if (
+          issue.title.startsWith(`[${featureLabel}] `) &&
+          issue.labels.some(l => l.name === featureLabel) &&
+          issue.title !== `[${featureLabel}] Feature`
+        ) {
+          const taskTitle = issue.title.replace(`[${featureLabel}] `, '');
+          if (!taskSet.has(taskTitle) && !issue.labels.some(l => l.name === 'remove')) {
+            // 標記 remove label
+            ensureLabel('remove');
+            const cmd = `gh issue edit ${issue.number} --add-label "remove"`;
+            execSync(cmd, { encoding: 'utf8' });
+            console.log(`Marked sub-issue as removed: ${issue.title}`);
+          }
+        }
+      }
+      // 再處理新增 sub issue
       for (const task of tasks) {
         const subIssueTitle = `[${featureLabel}] ${task}`;
         const exists = existingIssues.some(i => i.title === subIssueTitle && i.labels.some(l => l.name === featureLabel));
