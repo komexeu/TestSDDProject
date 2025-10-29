@@ -19,7 +19,7 @@ description: "Task list for 003-inventory-feature (多前綴分區塊)"
 - [ ] M001 [P] [US1] 實作查詢商品庫存 API（src/routes/inventory.ts）
 - [ ] M002 [P] [US2] 實作手動調整庫存 API（src/routes/inventory.ts）
 - [ ] M003 [P] [US3] 實作銷售自動扣庫存 API（src/routes/inventory.ts）
-- [ ] M004 [P] [US1] 實作查詢庫存異動紀錄 API（src/routes/inventory.ts）
+- [ ] M004 [P] [US4] 實作查詢庫存異動紀錄 API（src/routes/inventory.ts）
 - [ ] M005 [P] [US3] 實作高併發下庫存原子扣減邏輯（src/services/inventoryService.ts）
 - [ ] M006 [P] [US2] 實作庫存調整權限驗證（src/middleware/auth.ts）
 - [ ] M007 [P] [US3] 實作超賣防護與錯誤處理（src/services/inventoryService.ts）
@@ -30,7 +30,7 @@ description: "Task list for 003-inventory-feature (多前綴分區塊)"
 - [ ] T003 [P] [US3] 撰寫銷售自動扣庫存 API 單元測試（tests/inventory/inventory-sale.test.ts）
 - [ ] T004 [P] [US3] 撰寫高併發下超賣防護測試（tests/inventory/inventory-concurrency.test.ts）
 - [ ] T005 [P] [US3] 撰寫庫存異常錯誤處理測試（tests/inventory/inventory-stock.test.ts）
-- [ ] T006 [P] [US1] 撰寫庫存異動紀錄查詢 API 測試（tests/inventory/inventory-logs.test.ts）
+- [ ] T006 [P] [US4] 撰寫庫存異動紀錄查詢 API 測試（tests/inventory/inventory-logs.test.ts）
 
 ## 文件與同步 Tasks
 - [ ] D001 補充 data-model.md 與 API 文件（specs/003-inventory-feature/data-model.md, contracts/openapi.yaml）
@@ -47,6 +47,7 @@ description: "Task list for 003-inventory-feature (多前綴分區塊)"
 - M002 → T002, M006
 - M003 → T003, M005, M007
 - M005, M007 → T004, T005
+- M004 → T006
 - 所有 Txxx → D001, D002, D003, D004
 
 ## 平行執行建議
