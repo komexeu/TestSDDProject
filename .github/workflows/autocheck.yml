@@ -6,30 +6,19 @@ on:
       - master
 
 jobs:
-  set-matrix:
+  create-issues:
     runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.set_matrix.outputs.matrix }}
     steps:
       - uses: actions/checkout@v3
-      - name: Find all tasks.md
-        id: set_matrix
-        run: |
-          files=$(find specs -type f -name 'tasks.md' | jq -R . | jq -s .)
-          echo "matrix={\"tasks\":$files}" >> $GITHUB_OUTPUT
-
-  issue-bot:
-    needs: set-matrix
-    runs-on: ubuntu-latest
-    strategy:
-      matrix: ${{ fromJson(needs.set-matrix.outputs.matrix) }}
-    steps:
-      - uses: actions/checkout@v3
-      - name: Issue Bot (all specs)
-        uses: imjohnbo/issue-bot@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          file: ${{ matrix.tasks }}
-          labels: "speckit,auto-task"
-          title: "自動產生任務：{{text}}"
-          body: "來源：tasks.md\n\n{{text}}"
+          node-version: '18'
+      - name: Install gh cli
+        run: sudo apt-get install gh
+      - name: Install dependencies
+        run: npm install
+      - name: Create issues from all tasks.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/create-issues-from-tasks.js
