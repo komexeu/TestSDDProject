@@ -5,13 +5,14 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model Product {
   id          String         @id @default(uuid())
   name        String         @unique
+  code        String?        // 商品識別代號，可重複
   description String
   price       Int // 新台幣整數，>0
   stock       Int            @default(0) // 庫存數量，>=0
