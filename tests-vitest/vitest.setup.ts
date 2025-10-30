@@ -1,4 +1,4 @@
-import { execSync } from 'child_process';
+import { beforeAll } from 'vitest';
 import { PrismaClient } from '@prisma/client';
 
 beforeAll(async () => {
