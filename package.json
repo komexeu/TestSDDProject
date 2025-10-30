@@ -22,13 +22,14 @@
     "express": "^5.1.0",
     "hono": "^4.10.2",
     "husky": "^9.1.7",
-    "prisma": "^6.17.1",
+    "prisma": "^6.1.0",
     "sqlite3": "^5.1.7",
     "typescript": "^5.0.0",
     "vitest": "^4.0.4"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.5",
-    "@prisma/client": "^6.17.1"
+    "@prisma/client": "^6.1.0",
+    "@prisma/extension-accelerate": "^2.0.2"
   }
 }

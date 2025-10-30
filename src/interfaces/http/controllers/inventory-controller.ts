@@ -33,7 +33,7 @@ export class InventoryController {
   async adjustStock(c: Context) {
     const productId = c.req.param('productId');
     const data = await c.req.json();
-    
+
     try {
       const result = await this.adjustStockUseCase.execute({
         productId,
@@ -49,7 +49,7 @@ export class InventoryController {
 
   async saleStock(c: Context) {
     const data = await c.req.json();
-    
+
     try {
       const result = await this.saleStockUseCase.execute({
         productId: data.productId,

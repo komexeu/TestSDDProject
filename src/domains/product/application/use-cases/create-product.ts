@@ -1,6 +1,6 @@
 import { UseCase } from '../../../../shared/application/interfaces/use-case';
 import { CreateProductRequest, CreateProductResponse } from '../dto/product-dto';
-import { ProductRepository } from '../../domain/repositories/product-repository';
+import { IProductRepository } from '../../domain/repositories/product-repository';
 import { Product } from '../../domain/entities/product';
 import { ProductName, ProductDescription, ProductPrice, ProductCode } from '../../domain/value-objects/product-properties';
 import { ProductManagementService } from '../../domain/services/product-management';
@@ -9,7 +9,7 @@ import { ValidationError } from '../../../../shared/application/exceptions';
 
 export class CreateProductUseCase implements UseCase<CreateProductRequest, CreateProductResponse> {
   constructor(
-    private readonly productRepository: ProductRepository,
+    private readonly productRepository: IProductRepository,
     private readonly productManagementService: ProductManagementService,
     private readonly eventPublisher: DomainEventPublisher
   ) {}

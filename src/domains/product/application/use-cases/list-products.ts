@@ -1,9 +1,9 @@
 import { UseCase } from '../../../../shared/application/interfaces/use-case';
 import { ListProductsRequest, ListProductsResponse } from '../dto/product-dto';
-import { ProductQueryRepository } from '../../domain/repositories/product-repository';
+import { IProductQueryRepository } from '../../domain/repositories/product-repository';
 
 export class ListProductsUseCase implements UseCase<ListProductsRequest, ListProductsResponse> {
-  constructor(private readonly productQueryRepository: ProductQueryRepository) {}
+  constructor(private readonly productQueryRepository: IProductQueryRepository) {}
 
   async execute(request: ListProductsRequest): Promise<ListProductsResponse> {
     const products = await this.productQueryRepository.findByFilters({

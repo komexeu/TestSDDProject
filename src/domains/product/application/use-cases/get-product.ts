@@ -1,11 +1,11 @@
 import { UseCase } from '../../../../shared/application/interfaces/use-case';
 import { GetProductRequest, GetProductResponse } from '../dto/product-dto';
-import { ProductRepository } from '../../domain/repositories/product-repository';
+import { IProductRepository } from '../../domain/repositories/product-repository';
 import { ProductId } from '../../domain/entities/product';
 import { NotFoundError } from '../../../../shared/application/exceptions';
 
 export class GetProductUseCase implements UseCase<GetProductRequest, GetProductResponse> {
-  constructor(private readonly productRepository: ProductRepository) {}
+  constructor(private readonly productRepository: IProductRepository) {}
 
   async execute(request: GetProductRequest): Promise<GetProductResponse> {
     const productId = new ProductId(request.productId);

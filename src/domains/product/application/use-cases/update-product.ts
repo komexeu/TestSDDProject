@@ -1,6 +1,6 @@
 import { UseCase } from '../../../../shared/application/interfaces/use-case';
 import { UpdateProductRequest, UpdateProductResponse } from '../dto/product-dto';
-import { ProductRepository } from '../../domain/repositories/product-repository';
+import { IProductRepository } from '../../domain/repositories/product-repository';
 import { ProductId } from '../../domain/entities/product';
 import { ProductName, ProductDescription, ProductPrice, ProductCode } from '../../domain/value-objects/product-properties';
 import { ProductManagementService } from '../../domain/services/product-management';
@@ -9,7 +9,7 @@ import { NotFoundError } from '../../../../shared/application/exceptions';
 
 export class UpdateProductUseCase implements UseCase<UpdateProductRequest, UpdateProductResponse> {
   constructor(
-    private readonly productRepository: ProductRepository,
+    private readonly productRepository: IProductRepository,
     private readonly productManagementService: ProductManagementService,
     private readonly eventPublisher: DomainEventPublisher
   ) {}

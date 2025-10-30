@@ -2,7 +2,7 @@ import { Product, ProductId } from '../entities/product';
 import { ProductName } from '../value-objects/product-properties';
 
 // 產品倉儲介面
-export interface ProductRepository {
+export interface IProductRepository {
   findById(id: ProductId): Promise<Product | null>;
   findByName(name: ProductName): Promise<Product | null>;
   findAll(): Promise<Product[]>;
@@ -13,7 +13,7 @@ export interface ProductRepository {
 }
 
 // 產品查詢介面
-export interface ProductQueryRepository {
+export interface IProductQueryRepository {
   findByNamePattern(pattern: string): Promise<Product[]>;
   findByPriceRange(minPrice: number, maxPrice: number): Promise<Product[]>;
   findByFilters(filters: {
