@@ -24,10 +24,11 @@ export class GetStockUseCase implements UseCase<GetStockRequest, GetStockRespons
       throw new NotFoundError('Product', request.productId);
     }
 
-    return {
+    const response: GetStockResponse = {
       productId: product.id,
       quantity: product.stock,
       updatedAt: product.updatedAt
     };
+    return response;
   }
 }

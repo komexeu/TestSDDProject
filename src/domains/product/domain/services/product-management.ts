@@ -1,11 +1,11 @@
 import { Product } from '../entities/product';
 import { ProductName } from '../value-objects/product-properties';
-import { ProductRepository } from '../repositories/product-repository';
+import { IProductRepository } from '../repositories/product-repository';
 import { BusinessRuleError } from '../../../../shared/application/exceptions';
 
 // 產品管理領域服務
 export class ProductManagementService {
-  constructor(private readonly productRepository: ProductRepository) {}
+  constructor(private readonly productRepository: IProductRepository) {}
 
   /**
    * 驗證產品名稱是否唯一

@@ -46,14 +46,15 @@ export class AdjustStockUseCase implements UseCase<AdjustStockRequest, AdjustSto
       }
     });
 
-    return {
+    const response: AdjustStockResponse = {
       productId: updatedProduct.id,
-      previousQuantity,
+      previousQuantity: previousQuantity,
       newQuantity: updatedProduct.stock,
       delta: quantity - previousQuantity,
-      reason,
-      operator,
+      reason: reason,
+      operator: operator,
       updatedAt: new Date()
     };
+    return response;
   }
 }

@@ -3,7 +3,13 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export async function setupTestProduct(productId: string, initialStock = 100) {
+export async function setupTestProduct(
+  productId: string,
+  initialStock = 100,
+  isActive: boolean = true,
+  createdAt?: Date,
+  updatedAt?: Date
+) {
   return await prisma.product.create({
     data: {
       id: productId,
@@ -12,6 +18,9 @@ export async function setupTestProduct(productId: string, initialStock = 100) {
       description: `Test product description for ${productId}`,
       price: 1000,
       stock: initialStock,
+      isActive,
+      ...(createdAt ? { createdAt } : {}),
+      ...(updatedAt ? { updatedAt } : {}),
     },
   });
 }
@@ -36,7 +45,14 @@ export async function disconnectPrisma() {
   await prisma.$disconnect();
 }
 
-export async function createTestProduct(productName: string, productCode?: string, initialStock = 100) {
+export async function createTestProduct(
+  productName: string,
+  productCode?: string,
+  initialStock = 100,
+  isActive: boolean = true,
+  createdAt?: Date,
+  updatedAt?: Date
+) {
   return await prisma.product.create({
     data: {
       name: productName,
@@ -44,6 +60,9 @@ export async function createTestProduct(productName: string, productCode?: strin
       description: `Test product description for ${productName}`,
       price: 1000,
       stock: initialStock,
+      isActive,
+      ...(createdAt ? { createdAt } : {}),
+      ...(updatedAt ? { updatedAt } : {}),
     },
   });
 }

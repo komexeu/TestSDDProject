@@ -53,12 +53,13 @@ export class SaleStockUseCase implements UseCase<SaleStockRequest, SaleStockResp
       return updatedProduct;
     });
 
-    return {
+    const response: SaleStockResponse = {
       productId: result.id,
       remainingStock: result.stock,
       soldQuantity: quantity,
-      operator,
+      operator: operator,
       timestamp: new Date()
     };
+    return response;
   }
 }

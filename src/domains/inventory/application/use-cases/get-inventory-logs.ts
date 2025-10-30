@@ -25,7 +25,7 @@ export class GetInventoryLogsUseCase implements UseCase<GetInventoryLogsRequest,
       take: limit
     });
 
-    return {
+    const response: GetInventoryLogsResponse = {
       logs: logs.map(log => ({
         id: log.id,
         productId: log.productId,
@@ -37,7 +37,8 @@ export class GetInventoryLogsUseCase implements UseCase<GetInventoryLogsRequest,
         operator: log.operator,
         createdAt: log.createdAt
       })),
-      total
+      total: total
     };
+    return response;
   }
 }
