@@ -1,3 +1,5 @@
+// Prisma 型別（僅用於轉換）
+import type { Product as PrismaProduct } from '@prisma/client';
 import { AggregateRoot } from '../../../../shared/domain/entities/base';
 import { Id } from '../../../../shared/domain/value-objects/common';
 import { ProductName, ProductDescription, ProductPrice, ProductCode } from '../value-objects/product-properties';
@@ -48,6 +50,7 @@ export class ProductDeletedEvent implements DomainEvent {
 // 產品聚合根
 export class Product extends AggregateRoot<ProductId> {
   private _code?: ProductCode;
+  private _stock: number = 0;
   private _name: ProductName;
   private _description: ProductDescription;
   private _price: ProductPrice;
@@ -63,7 +66,8 @@ export class Product extends AggregateRoot<ProductId> {
     code?: ProductCode,
     createdAt?: Date,
     updatedAt?: Date,
-    isActive?: boolean
+    isActive?: boolean,
+    stock?: number
   ) {
     super(id);
     
@@ -74,6 +78,7 @@ export class Product extends AggregateRoot<ProductId> {
     this._createdAt = createdAt || new Date();
     this._updatedAt = updatedAt || new Date();
     this._isActive = isActive !== undefined ? isActive : true;
+    this._stock = stock ?? 0;
 
     // 如果是新建立的產品，發布事件
     if (!createdAt) {
@@ -95,6 +100,38 @@ export class Product extends AggregateRoot<ProductId> {
   // Getters
   get code(): ProductCode | undefined {
     return this._code;
+  }
+  get stock(): number {
+    return this._stock;
+  }
+  // Prisma 轉換靜態方法
+  public static fromPrisma(prismaProduct: PrismaProduct): Product {
+    return new Product(
+      new ProductId(prismaProduct.id),
+      new ProductName(prismaProduct.name),
+      new ProductDescription(prismaProduct.description),
+      new ProductPrice(prismaProduct.price),
+      prismaProduct.code ? new ProductCode(prismaProduct.code) : undefined,
+      prismaProduct.createdAt,
+      prismaProduct.updatedAt,
+      prismaProduct.isActive,
+      prismaProduct.stock
+    );
+  }
+
+  // 轉換為 Prisma 格式
+  public toPrisma(): any {
+    return {
+      id: this.id.value,
+      name: this._name.value,
+      description: this._description.value,
+      price: this._price.value,
+      code: this._code ? this._code.value : undefined,
+      createdAt: this._createdAt,
+      updatedAt: this._updatedAt,
+      isActive: this._isActive,
+      stock: this._stock,
+    };
   }
 
   get name(): ProductName {

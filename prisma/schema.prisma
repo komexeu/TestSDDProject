@@ -26,6 +26,8 @@ model Product {
   createdAt   DateTime       @default(now())
   /// 更新時間
   updatedAt   DateTime       @updatedAt
+  /// 是否啟用
+  isActive    Boolean        @default(true)
   /// 商品庫存異動紀錄
   logs        InventoryLog[]
 }
