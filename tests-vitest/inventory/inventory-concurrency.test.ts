@@ -13,6 +13,7 @@ const getStockUseCase = new GetStockUseCase(prisma);
 
 describe('高併發防超賣測試', () => {
   beforeAll(async () => {
+    await cleanupTestProduct(productId);
     await setupTestProduct(productId);
     await adjustStockUseCase.execute({ 
       productId, 
@@ -23,7 +24,6 @@ describe('高併發防超賣測試', () => {
   });
   
   afterAll(async () => {
-    await cleanupTestProduct(productId);
     await prisma.$disconnect();
     await disconnectPrisma();
   });

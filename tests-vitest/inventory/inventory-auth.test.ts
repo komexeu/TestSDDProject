@@ -17,11 +17,11 @@ describe('API 權限控管測試', () => {
   };
 
   beforeAll(async () => {
+    await cleanupTestProduct(productId);
     await setupTestProduct(productId);
   });
 
   afterAll(async () => {
-    await cleanupTestProduct(productId);
     await disconnectPrisma();
   });
 

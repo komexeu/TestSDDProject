@@ -11,11 +11,11 @@ describe('API 單元與整合測試', () => {
   };
 
   beforeAll(async () => {
+    await cleanupTestProduct(productId);
     await setupTestProduct(productId);
   });
 
   afterAll(async () => {
-    await cleanupTestProduct(productId);
     await disconnectPrisma();
   });
 

@@ -11,10 +11,10 @@ const adjustStockUseCase = new AdjustStockUseCase(prisma);
 
 describe('查詢商品庫存異動紀錄 Use Case', () => {
   beforeAll(async () => {
+    await cleanupTestProduct(productId);
     await setupTestProduct(productId);
   });
   afterAll(async () => {
-    await cleanupTestProduct(productId);
     await prisma.$disconnect();
     await disconnectPrisma();
   });

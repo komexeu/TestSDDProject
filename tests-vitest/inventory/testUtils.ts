@@ -36,11 +36,6 @@ export async function cleanupTestProduct(productId: string) {
   });
 }
 
-export async function cleanupTestData() {
-  await prisma.inventoryLog.deleteMany();
-  await prisma.product.deleteMany();
-}
-
 export async function disconnectPrisma() {
   await prisma.$disconnect();
 }
