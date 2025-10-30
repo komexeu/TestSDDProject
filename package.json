@@ -9,16 +9,20 @@
     "build": "tsc",
     "test": "jest",
     "dev": "tsc --watch",
-    "generate-tests": "node scripts/generate-test-structure.js"
+    "generate-tests": "node scripts/generate-test-structure.js",
+    "prepare": "husky install"
   },
   "devDependencies": {
-    "@types/jest": "^30.0.0",    
+    "@commitlint/cli": "^20.1.0",
+    "@commitlint/config-conventional": "^20.0.0",
+    "@types/jest": "^30.0.0",
     "@vitest/ui": "^4.0.4",
     "cross-env": "^10.1.0",
     "dotenv-cli": "^11.0.0",
     "drizzle-orm": "^0.44.6",
     "express": "^5.1.0",
     "hono": "^4.10.2",
+    "husky": "^9.1.7",
     "jest": "^29.7.0",
     "prisma": "^6.17.1",
     "sqlite3": "^5.1.7",
