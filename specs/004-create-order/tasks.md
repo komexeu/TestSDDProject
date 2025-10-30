@@ -18,9 +18,22 @@
 - [ ] M008 [P] [US3] 設計訂單建立成功通知服務於 src/domains/order/domain/services/orderNotificationService.ts
 
 ## 測試任務
-- [ ] T001 [P] [US1] 建立訂單單元測試於 tests-vitest/order/orderCore.test.ts
-- [ ] T002 [P] [US2] 訂單資料驗證測試於 tests-vitest/models/productValidation.test.ts
-- [ ] T003 [P] [US3] 訂單通知服務測試於 tests-vitest/order/orderNotification.test.ts
+
+- [ ] T001 [P] [US1] 建立訂單單元測試於 (tests-vitest/order/orderCore.test.ts)
+	- 驗證訂單建立時狀態、明細、金額正確
+	- 驗證訂單狀態流轉（如：已點餐→已確認→製作中→可取餐→已取餐完成）
+	- 驗證異常流程（如：狀態錯誤時拋出例外）
+
+- [ ] T002 [P] [US2] 訂單資料驗證測試於 (tests-vitest/models/productValidation.test.ts)
+	- 驗證商品名稱、數量、價格等欄位驗證規則
+	- 驗證不合法資料時會正確拋出錯誤
+
+- [ ] T003 [P] [US3] 訂單通知服務測試於 (tests-vitest/order/orderNotification.test.ts)
+	- 驗證訂單建立後會正確發送通知
+	- 驗證通知內容正確（如：訂單編號、狀態、用戶資訊）
+
+- [ ] T004 [US1] 建立訂單時，資料會正確寫入資料庫，並可查詢驗證（含訂單主檔與明細）
+- [ ] T005 [US1] 建立訂單 API 整合測試，驗證前後端串接流程與資料正確性
 
 ## 文件與同步任務
 - [ ] D001 補充 API 文件於 specs/004-create-order/contracts/openapi.yaml

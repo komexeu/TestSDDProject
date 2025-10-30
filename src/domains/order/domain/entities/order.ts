@@ -1,3 +1,4 @@
+// (已移除簡易物件型別與函式，僅保留 DDD 聚合根 class 架構)
 import { AggregateRoot } from '../../../../shared/domain/entities/base';
 import { Id } from '../../../../shared/domain/value-objects/common';
 import { OrderStatus } from '../value-objects/order-status';

@@ -1,3 +1,40 @@
+/// 訂單主檔
+model Order {
+  /// 訂單唯一編號
+  id          String       @id @default(uuid())
+  /// 下單用戶 ID
+  userId      String
+  /// 訂單狀態（如：已點餐、可取餐、已取餐完成、已取消）
+  status      String
+  /// 訂單總金額（所有明細加總）
+  totalAmount Int
+  /// 建立時間
+  createdAt   DateTime     @default(now())
+  /// 最後更新時間
+  updatedAt   DateTime     @updatedAt
+  /// 訂單明細
+  items       OrderItem[]
+}
+
+/// 訂單明細
+model OrderItem {
+  /// 明細唯一編號
+  id        String   @id @default(uuid())
+  /// 所屬訂單
+  order     Order    @relation(fields: [orderId], references: [id])
+  /// 訂單 id
+  orderId   String
+  /// 商品 id
+  productId String
+  /// 商品名稱
+  name      String
+  /// 數量
+  quantity  Int
+  /// 商品單價
+  price     Int
+  /// 小計（單價*數量）
+  totalPrice Int
+}
 // Prisma schema for 商品管理
 
 generator client {
