@@ -1,28 +1,48 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { getInventoryLogs, adjustProductStock } from '../../src/services/inventoryService';
+import { GetInventoryLogsUseCase } from '../../src/domains/inventory/application/use-cases/get-inventory-logs';
+import { AdjustStockUseCase } from '../../src/domains/inventory/application/use-cases/adjust-stock';
 import { setupTestProduct, cleanupTestProduct, disconnectPrisma } from './testUtils';
-const productId = 'logs-test-product';
+import { PrismaClient } from '@prisma/client';
 
-describe('查詢商品庫存異動紀錄 API', () => {
+const productId = 'logs-test-product';
+const prisma = new PrismaClient();
+const getInventoryLogsUseCase = new GetInventoryLogsUseCase(prisma);
+const adjustStockUseCase = new AdjustStockUseCase(prisma);
+
+describe('查詢商品庫存異動紀錄 Use Case', () => {
   beforeAll(async () => {
     await setupTestProduct(productId);
   });
   afterAll(async () => {
     await cleanupTestProduct(productId);
+    await prisma.$disconnect();
     await disconnectPrisma();
   });
 
   it('應取得異動紀錄', async () => {
     // 先做一次調整，確保有紀錄
-    await adjustProductStock({ productId, newStock: 5, reason: 'log-test', operator: 'tester' });
-    const logs = await getInventoryLogs(productId);
-    expect(Array.isArray(logs)).toBe(true);
-    expect(logs.length).toBeGreaterThan(0);
-    expect(logs[0]).toHaveProperty('before');
-    expect(logs[0]).toHaveProperty('after');
-    expect(logs[0]).toHaveProperty('delta');
-    expect(logs[0]).toHaveProperty('reason');
-    expect(logs[0]).toHaveProperty('operator');
-    expect(logs[0]).toHaveProperty('createdAt');
+    await adjustStockUseCase.execute({ 
+      productId, 
+      quantity: 5, 
+      reason: 'log-test', 
+      operator: 'tester' 
+    });
+
+    const result = await getInventoryLogsUseCase.execute({ productId });
+    
+    expect(result.logs).toBeDefined();
+    expect(Array.isArray(result.logs)).toBe(true);
+    expect(result.logs.length).toBeGreaterThan(0);
+    expect(result.total).toBeGreaterThan(0);
+    
+    const firstLog = result.logs[0];
+    expect(firstLog).toHaveProperty('beforeQuantity');
+    expect(firstLog).toHaveProperty('afterQuantity');
+    expect(firstLog).toHaveProperty('delta');
+    expect(firstLog).toHaveProperty('reason');
+    expect(firstLog).toHaveProperty('operator');
+    expect(firstLog).toHaveProperty('createdAt');
+    expect(firstLog.reason).toBe('log-test');
+    expect(firstLog.operator).toBe('tester');
   });
 });

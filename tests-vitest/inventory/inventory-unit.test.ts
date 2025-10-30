@@ -1,49 +1,107 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { getProductStock, adjustProductStock, saleProduct, getInventoryLogs } from '../../src/services/inventoryService';
+import { GetStockUseCase } from '../../src/domains/inventory/application/use-cases/get-stock';
+import { AdjustStockUseCase } from '../../src/domains/inventory/application/use-cases/adjust-stock';
+import { SaleStockUseCase } from '../../src/domains/inventory/application/use-cases/sale-stock';
+import { GetInventoryLogsUseCase } from '../../src/domains/inventory/application/use-cases/get-inventory-logs';
 import { setupTestProduct, cleanupTestProduct, disconnectPrisma } from './testUtils';
+import { PrismaClient } from '@prisma/client';
 
 const productId = 'unit-test-product';
-describe('Inventory Service 單元測試', () => {
+const prisma = new PrismaClient();
+const getStockUseCase = new GetStockUseCase(prisma);
+const adjustStockUseCase = new AdjustStockUseCase(prisma);
+const saleStockUseCase = new SaleStockUseCase(prisma);
+const getInventoryLogsUseCase = new GetInventoryLogsUseCase(prisma);
+
+describe('Inventory Use Cases 單元測試', () => {
   beforeAll(async () => {
     await setupTestProduct(productId);
   });
 
   afterAll(async () => {
     await cleanupTestProduct(productId);
+    await prisma.$disconnect();
     await disconnectPrisma();
   });
 
-  it('getProductStock 應取得正確庫存', async () => {
-    const product = await getProductStock(productId);
-    expect(product).toBeDefined();
-    expect(product?.stock).toBeGreaterThanOrEqual(0);
+  it('GetStockUseCase 應取得正確庫存', async () => {
+    const result = await getStockUseCase.execute({ productId });
+    expect(result).toBeDefined();
+    expect(result.quantity).toBeGreaterThanOrEqual(0);
+    expect(result.productId).toBe(productId);
   });
 
-  it('adjustProductStock 應可調整庫存', async () => {
-    const result = await adjustProductStock({ productId, newStock: 5, reason: 'unit', operator: 'tester' });
-    expect(result).toMatchObject({ productId, stock: 5 });
-    const product = await getProductStock(productId);
-    expect(product?.stock).toBe(5);
+  it('AdjustStockUseCase 應可調整庫存', async () => {
+    const result = await adjustStockUseCase.execute({ 
+      productId, 
+      quantity: 5, 
+      reason: 'unit test', 
+      operator: 'tester' 
+    });
+    
+    expect(result).toMatchObject({ 
+      productId, 
+      newQuantity: 5 
+    });
+    
+    const stockResult = await getStockUseCase.execute({ productId });
+    expect(stockResult.quantity).toBe(5);
   });
 
-  it('saleProduct 應可扣庫存', async () => {
-    await adjustProductStock({ productId, newStock: 10 });
-    const result = await saleProduct({ productId, quantity: 2 });
-    expect(result).toMatchObject({ productId, stock: 8 });
+  it('SaleStockUseCase 應可扣庫存', async () => {
+    await adjustStockUseCase.execute({ 
+      productId, 
+      quantity: 10, 
+      reason: 'prepare for sale', 
+      operator: 'tester' 
+    });
+    
+    const result = await saleStockUseCase.execute({ 
+      productId, 
+      quantity: 2, 
+      operator: 'tester' 
+    });
+    
+    expect(result).toMatchObject({ 
+      productId, 
+      remainingStock: 8,
+      soldQuantity: 2
+    });
   });
 
-  it('getInventoryLogs 應取得異動紀錄', async () => {
-    const logs = await getInventoryLogs(productId);
-    expect(Array.isArray(logs)).toBe(true);
-    expect(logs.length).toBeGreaterThan(0);
+  it('GetInventoryLogsUseCase 應取得異動紀錄', async () => {
+    const result = await getInventoryLogsUseCase.execute({ productId });
+    expect(result.logs).toBeDefined();
+    expect(Array.isArray(result.logs)).toBe(true);
+    expect(result.logs.length).toBeGreaterThan(0);
+    expect(result.total).toBeGreaterThan(0);
   });
 
-  it('adjustProductStock 負數應拋錯', async () => {
-    await expect(adjustProductStock({ productId, newStock: -1 })).rejects.toThrow('庫存不可為負數');
+  it('AdjustStockUseCase 負數應拋錯', async () => {
+    await expect(
+      adjustStockUseCase.execute({ 
+        productId, 
+        quantity: -1, 
+        reason: 'test negative', 
+        operator: 'tester' 
+      })
+    ).rejects.toThrow('庫存不可為負數');
   });
 
-  it('saleProduct 庫存不足應拋錯', async () => {
-    await adjustProductStock({ productId, newStock: 1 });
-    await expect(saleProduct({ productId, quantity: 2 })).rejects.toThrow('庫存不足');
+  it('SaleStockUseCase 庫存不足應拋錯', async () => {
+    await adjustStockUseCase.execute({ 
+      productId, 
+      quantity: 1, 
+      reason: 'set low stock', 
+      operator: 'tester' 
+    });
+    
+    await expect(
+      saleStockUseCase.execute({ 
+        productId, 
+        quantity: 2, 
+        operator: 'tester' 
+      })
+    ).rejects.toThrow('庫存不足');
   });
 });
