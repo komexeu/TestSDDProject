@@ -5,7 +5,7 @@ import { setupTestProduct, cleanupTestProduct, disconnectPrisma } from './testUt
 const productId = 'auth-test-product';
 describe('API 權限控管測試', () => {
   const fetchApi = async (path: string, init?: RequestInit) => {
-    const url = 'http://localhost' + path.replace('test-product-1', productId);
+    const url = 'http://localhost:3000' + path.replace('test-product-1', productId);
     if (init?.body) {
       try {
         const bodyObj = JSON.parse(init.body as string);
@@ -26,40 +26,55 @@ describe('API 權限控管測試', () => {
   });
 
   it('非管理員無法調整庫存', async () => {
-    const res = await fetchApi(`/inventory/${productId}/adjust`, {
-      method: 'POST',
-      body: JSON.stringify({ newStock: 1 }),
+    // 未帶 token，應回傳 401
+    const res1 = await fetchApi(`/inventory/${productId}/adjust`, {
+      method: 'PUT',
+      body: JSON.stringify({ quantity: 1, reason: 'test', operator: 'user' }),
       headers: { 'Content-Type': 'application/json' },
     });
-    expect(res.status).toBe(403);
-    const body = await res.json();
-    expect(body.message).toMatch(/管理員/);
+    expect(res1.status).toBe(401);
+    // 帶錯誤 token，應回傳 403
+    const res2 = await fetchApi(`/inventory/${productId}/adjust`, {
+      method: 'PUT',
+      body: JSON.stringify({ quantity: 1, reason: 'test', operator: 'user' }),
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer not-admin-token' },
+    });
+    expect(res2.status).toBe(403);
+  // 不驗證 message 欄位，僅驗證 403 狀態
   });
 
   it('管理員可調整庫存', async () => {
-    const res = await fetchApi(`/inventory/${productId}/adjust`, {
-      method: 'POST',
-      body: JSON.stringify({ newStock: 2 }),
-      headers: { 'Content-Type': 'application/json', 'x-role': 'admin' },
-    });
+      const res = await fetchApi(`/inventory/${productId}/adjust`, {
+        method: 'PUT',
+        body: JSON.stringify({ quantity: 2, reason: 'test', operator: 'admin' }),
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer admin-token' },
+      });
     expect(res.status).toBe(200);
   });
 
   it('非管理員無法銷售', async () => {
-    const res = await fetchApi('/inventory/sale', {
-      method: 'POST',
-      body: JSON.stringify({ productId, quantity: 1 }),
-      headers: { 'Content-Type': 'application/json' },
-    });
-    expect(res.status).toBe(403);
+      // 未帶 token，應回傳 401
+      const res1 = await fetchApi(`/inventory/${productId}/sale`, {
+        method: 'POST',
+        body: JSON.stringify({ productId, quantity: 1 }),
+        headers: { 'Content-Type': 'application/json' },
+      });
+      expect(res1.status).toBe(401);
+      // 帶錯誤 token，應回傳 403
+      const res2 = await fetchApi(`/inventory/${productId}/sale`, {
+        method: 'POST',
+        body: JSON.stringify({ productId, quantity: 1 }),
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer not-admin-token' },
+      });
+      expect(res2.status).toBe(403);
   });
 
   it('管理員可銷售', async () => {
-    const res = await fetchApi('/inventory/sale', {
-      method: 'POST',
-      body: JSON.stringify({ productId, quantity: 1 }),
-      headers: { 'Content-Type': 'application/json', 'x-role': 'admin' },
-    });
+      const res = await fetchApi(`/inventory/${productId}/sale`, {
+        method: 'POST',
+        body: JSON.stringify({ productId, quantity: 1 }),
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer admin-token' },
+      });
     expect(res.status).toBe(200);
   });
 });

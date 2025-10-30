@@ -1,11 +1,12 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { setupTestProduct, cleanupTestProduct, disconnectPrisma } from './testUtils';
 import { callback } from '../../src/index';
+import type { GetStockResponse, AdjustStockResponse, SaleStockResponse } from '../../src/domains/inventory/application/dto/inventory-dto';
 
 const productId = 'api-test-product';
 describe('API 單元與整合測試', () => {
   const fetchApi = async (path: string, init?: RequestInit) => {
-    const url = 'http://localhost' + path.replace('test-product-1', productId);
+    const url = 'http://localhost:3000' + path.replace('test-product-1', productId);
     return callback(new Request(url, init));
   };
 
@@ -21,9 +22,9 @@ describe('API 單元與整合測試', () => {
   it('查詢商品庫存', async () => {
     const res = await fetchApi(`/inventory/${productId}`, { method: 'GET' });
     expect(res.status).toBe(200);
-    const body = await res.json();
-    expect(body).toHaveProperty('productId');
-    expect(body).toHaveProperty('stock');
+    const body: GetStockResponse = await res.json();
+    expect(body.productId).toBe(productId);
+    expect(typeof body.quantity).toBe('number');
   });
 
   it('查詢異動紀錄', async () => {
@@ -35,25 +36,25 @@ describe('API 單元與整合測試', () => {
 
   it('手動調整庫存', async () => {
     const res = await fetchApi(`/inventory/${productId}/adjust`, {
-      method: 'POST',
-      body: JSON.stringify({ newStock: 7, reason: 'api-test', operator: 'tester' }),
-      headers: { 'Content-Type': 'application/json', 'x-role': 'admin' },
+      method: 'PUT',
+      body: JSON.stringify({ quantity: 7, reason: 'api-test', operator: 'tester' }),
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer admin-token' },
     });
     expect(res.status).toBe(200);
-    const body = await res.json();
-    expect(body).toHaveProperty('productId');
-    expect(body).toHaveProperty('stock');
+    const body: AdjustStockResponse = await res.json();
+    expect(body.productId).toBe(productId);
+    expect(typeof body.newQuantity).toBe('number');
   });
 
   it('銷售自動扣庫存', async () => {
-    const res = await fetchApi('/inventory/sale', {
+    const res = await fetchApi(`/inventory/${productId}/sale`, {
       method: 'POST',
       body: JSON.stringify({ productId, quantity: 1 }),
-      headers: { 'Content-Type': 'application/json', 'x-role': 'admin' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer admin-token' },
     });
     expect(res.status).toBe(200);
-    const body = await res.json();
-    expect(body).toHaveProperty('productId');
-    expect(body).toHaveProperty('stock');
+    const body: SaleStockResponse = await res.json();
+    expect(body.productId).toBe(productId);
+    expect(typeof body.remainingStock).toBe('number');
   });
 });

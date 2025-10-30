@@ -1,11 +1,5 @@
-import { Hono } from 'hono';
-import productApi from './api/product';
-import inventory from './routes/inventory';
-
-
-const app = new Hono();
-app.route('/api', productApi);
-app.route('/', inventory);
+// 新的 DDD 架構主入口點
+import app from './app';
 
 export default app;
 export const callback = app.fetch;

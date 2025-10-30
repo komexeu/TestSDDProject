@@ -58,7 +58,7 @@ import { setup{FeatureName}TestData, cleanup{FeatureName}TestData, disconnectPri
 
 describe('{FeatureName} API 測試', () => {
   const fetchApi = async (path: string, init?: RequestInit) => {
-    const url = 'http://localhost' + path;
+    const url = 'http://localhost:3000' + path;
     return callback(new Request(url, init));
   };
 
@@ -142,7 +142,7 @@ import { setup{FeatureName}TestData, cleanup{FeatureName}TestData, disconnectPri
 
 describe('{FeatureName} 權限測試', () => {
   const fetchApi = async (path: string, init?: RequestInit) => {
-    const url = 'http://localhost' + path;
+    const url = 'http://localhost:3000' + path;
     return callback(new Request(url, init));
   };
 

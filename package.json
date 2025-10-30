@@ -1,14 +1,14 @@
 {
   "name": "order-system-flow",
   "version": "0.1.0",
-  "type": "module",
   "main": "dist/index.js",
   "scripts": {
     "test": "rm -f ./test.db && cross-env NODE_ENV=test dotenv -e .env.test npx prisma migrate deploy && cross-env NODE_ENV=test dotenv -e .env.test npx vitest run --dir=tests-vitest",
     "test:watch": "cross-env NODE_ENV=test dotenv -e .env.test npx vitest --dir=tests-vitest",
     "test:ui": "cross-env NODE_ENV=test dotenv -e .env.test npx vitest --ui --dir=tests-vitest",
     "build": "tsc",
-    "dev": "tsc --watch",
+    "dev": "tsc && node dist/server.js",
+    "start": "node dist/server.js",
     "generate-tests": "node scripts/generate-test-structure.js",
     "prepare": "husky install"
   },
@@ -22,12 +22,14 @@
     "express": "^5.1.0",
     "hono": "^4.10.2",
     "husky": "^9.1.7",
-    "prisma": "^6.17.1",
+    "prisma": "^6.1.0",
     "sqlite3": "^5.1.7",
     "typescript": "^5.0.0",
     "vitest": "^4.0.4"
   },
   "dependencies": {
-    "@prisma/client": "^6.17.1"
+    "@hono/node-server": "^1.19.5",
+    "@prisma/client": "^6.1.0",
+    "@prisma/extension-accelerate": "^2.0.2"
   }
 }

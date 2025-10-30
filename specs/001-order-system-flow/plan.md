@@ -54,17 +54,52 @@ specs/001-order-system-flow/
 
 ```
 src/
+├── app.ts                          # 應用程式入口點
+├── index.ts                        # 主要入口檔案  
+├── server.ts                       # 伺服器設定
+├── domains/                        # DDD 領域層架構
+│   ├── order/                      # 訂單領域
+│   │   ├── application/            # 應用層
+│   │   │   ├── dto/               # 資料傳輸物件
+│   │   │   └── use-cases/         # 使用案例（業務邏輯）
+│   │   ├── domain/                # 領域層
+│   │   │   ├── entities/          # 實體
+│   │   │   ├── repositories/      # 儲存庫介面
+│   │   │   ├── services/          # 領域服務
+│   │   │   └── value-objects/     # 值物件
+│   │   └── infrastructure/        # 基礎設施層
+│   │       └── repositories/      # 儲存庫實作
+│   ├── product/                   # 商品領域
+│   └── inventory/                 # 庫存領域
+├── interfaces/                    # 介面層
+│   └── http/                     # HTTP 介面
+│       ├── controllers/          # 控制器
+│       ├── middleware/           # 中介軟體
+│       └── routes/               # 路由設定
+├── shared/                       # 共用元件
+│   ├── application/              # 應用層共用
+│   ├── domain/                   # 領域層共用
+│   └── infrastructure/           # 基礎設施層共用
+└── services/                     # 服務層（待重構為 DDD）
+
+tests-vitest/                     # 測試目錄
+├── README.md                     # 測試說明文件
+├── vitest.setup.ts              # 測試設定
+├── orderCore.test.ts            # 核心訂單測試
+└── [domain]/                    # 各領域測試
+
+prisma/                          # Prisma ORM 相關
+├── schema.prisma               # 資料庫 Schema
+└── migrations/                 # 資料庫遷移
 ```
 
-**結構決定**：[Document the selected structure and reference the real
-directories captured above]
+**結構決定**：採用 Domain-Driven Design (DDD) 架構，將訂單系統實作於 `src/domains/order/` 下，遵循清潔架構分層。整合 Line Messaging API 於介面層，確保核心業務邏輯與外部服務解耦。
 
-## 复雜度追蹤
+## 復雜度追蹤
 
 *僅填寫若憲章檢查有違反，且必須說明理由*
 
 | 違反 | 為何需要 | 更簡單的替代方案被拒絕因為 |
 |-----------|------------|-------------------------------------|
-| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
+| 無 | 遵循 DDD 架構原則 | 確保程式碼可維護性與測試性 |
 
