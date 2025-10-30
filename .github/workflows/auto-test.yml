@@ -34,5 +34,5 @@ jobs:
       - name: Setup test env
         run: |
           echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/testdb" > .env.test
-      - name: Run Vitest
-        run: npm run vitest-test:clean
+      - name: Run Tests
+        run: npm test
