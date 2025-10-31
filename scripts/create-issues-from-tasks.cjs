@@ -123,6 +123,7 @@ function main() {
           // 如果 T 開頭但沒有 test 標籤，補上
           const existing = existingIssues.find(i => i.title === subIssueTitle && i.labels.some(l => l.name === featureLabel));
           if (extraLabels.includes('test')) {
+
             if (existing && !existing.labels.some(l => l.name === 'test')) {
               ensureLabel('test');
               const cmd = `gh issue edit ${existing.number} --add-label "test"`;
@@ -137,7 +138,7 @@ function main() {
           }
           // 只在細項內容不同時才更新 body
           if (existing && existing.body !== newSubBody) {
-            const cmd = `gh issue edit ${existing.number} --body "${newSubBody.replace(/"/g, '\\"').replace(/\n/g, '\\n')}"`;
+            const cmd = `gh issue edit ${existing.number} --body "${newSubBody.replace(/"/g, '\"')}"`;
             execSync(cmd, { encoding: 'utf8' });
             console.log(`Updated sub-issue body: ${subIssueTitle}`);
           }

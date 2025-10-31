@@ -22,10 +22,20 @@
 
 ## 測試 Tasks
 - [ ] T001 [P] [US1] 撰寫用戶下單 API 單元測試（tests/orderCore.test.ts）
+	- 驗證用戶下單時訂單狀態、明細、金額正確。
+	- 驗證訂單建立後資料正確寫入資料庫。
+	- 驗證異常下單流程會正確拋出例外。
 - [ ] T002 [P] [US2] 撰寫櫃檯確認訂單 API 測試（tests/orderCore.test.ts）
+	- 驗證櫃檯可正確確認訂單，狀態正確轉換。
+	- 驗證確認失敗時會拋出例外。
 - [ ] T003 [P] [US3] 撰寫廚房接單與狀態推進 API 測試（tests/orderCore.test.ts）
+	- 驗證廚房可正確接單並推進訂單狀態。
+	- 驗證狀態推進流程異常時會拋出例外。
 - [ ] T004 [P] [US4] 撰寫訂單完成與取餐 API 測試（tests/orderCore.test.ts）
+	- 驗證訂單完成與取餐流程正確。
+	- 驗證取餐失敗時會拋出例外。
 - [ ] T005 [P] 撰寫訂單狀態流轉與異常測試（tests/orderCore.test.ts）
+	- 驗證訂單狀態流轉正確，異常狀態時會拋出例外。
 
 ## 文件與同步 Tasks
 - [ ] D001 補充 data-model.md 與 API 文件（specs/001-order-system-flow/data-model.md, contracts/openapi.yaml）
