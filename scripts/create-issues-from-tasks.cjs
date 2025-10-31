@@ -121,14 +121,25 @@ function main() {
         if (exists) {
           console.log(`[${featureLabel}] Sub issue already exists: ${subIssueTitle}`);
           // 如果 T 開頭但沒有 test 標籤，補上
+          const existing = existingIssues.find(i => i.title === subIssueTitle && i.labels.some(l => l.name === featureLabel));
           if (extraLabels.includes('test')) {
-            const existing = existingIssues.find(i => i.title === subIssueTitle && i.labels.some(l => l.name === featureLabel));
             if (existing && !existing.labels.some(l => l.name === 'test')) {
               ensureLabel('test');
               const cmd = `gh issue edit ${existing.number} --add-label "test"`;
               execSync(cmd, { encoding: 'utf8' });
               console.log(`Added test label to: ${subIssueTitle}`);
             }
+          }
+          // 檢查細項有無變更，若有則更新 subbody
+          let newSubBody = `Parent: #${mainIssueNumber}\n\nAuto-generated from ${spec}/tasks.md`;
+          if (task.details && task.details.length > 0) {
+            newSubBody += `\n\n**細項：**\n` + task.details.map(d => `- ${d}`).join('\n');
+          }
+          // 只在細項內容不同時才更新 body
+          if (existing && existing.body !== newSubBody) {
+            const cmd = `gh issue edit ${existing.number} --body "${newSubBody.replace(/"/g, '\\"').replace(/\n/g, '\\n')}"`;
+            execSync(cmd, { encoding: 'utf8' });
+            console.log(`Updated sub-issue body: ${subIssueTitle}`);
           }
         } else {
           console.log(`[${featureLabel}] Creating sub issue: ${subIssueTitle}`);
