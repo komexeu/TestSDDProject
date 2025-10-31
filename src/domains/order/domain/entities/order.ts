@@ -1,6 +1,7 @@
 import { AggregateRoot } from '../../../../shared/domain/entities/base';
 import { Id } from '../../../../shared/domain/value-objects/common';
 import { OrderStatus } from '../value-objects/order-status';
+import { OrderStateMachineService } from '../services/OrderStateMachineService';
 import { OrderItem } from '../value-objects/order-item';
 import { BusinessRuleError } from '../../../../shared/application/exceptions';
 import { DomainEvent } from '../../../../shared/domain/events/domain-event';
@@ -88,7 +89,7 @@ export class Order extends AggregateRoot<OrderId> {
 
     this._userId = userId;
     this._items = [...items];
-    this._status = status || OrderStatus.ORDERED;
+    this._status = status || OrderStatus.已點餐;
     this._createdAt = createdAt || new Date();
     this._updatedAt = updatedAt || new Date();
     this._cancelledBy = cancelledBy;
@@ -141,9 +142,8 @@ export class Order extends AggregateRoot<OrderId> {
 
   // 業務方法：狀態轉換
   public transitionTo(newStatus: OrderStatus): void {
-    if (!this._status.canTransitionTo(newStatus)) {
-      throw new BusinessRuleError(`無法從 ${this._status.value} 轉換到 ${newStatus.value}`);
-    }
+    // 使用 OrderStateMachineService 進行狀態轉換驗證
+    OrderStateMachineService.prototype.validateTransition(this, newStatus);
 
     const previousStatus = this._status.value;
     this._status = newStatus;
@@ -163,7 +163,7 @@ export class Order extends AggregateRoot<OrderId> {
       throw new BusinessRuleError('僅能於「已點餐」或「已確認訂單」狀態取消訂單');
     }
 
-    this._status = OrderStatus.CANCELLED;
+    this._status = OrderStatus.已取消;
     this._cancelledBy = cancelledBy;
     this._updatedAt = new Date();
     this._errorMessage = null;
@@ -173,42 +173,42 @@ export class Order extends AggregateRoot<OrderId> {
 
   // 業務方法：完成訂單
   public complete(): void {
-    if (this._status !== OrderStatus.READY_FOR_PICKUP) {
+    if (this._status !== OrderStatus.可取餐) {
       throw new BusinessRuleError('僅能於「可取餐」狀態完成訂單');
     }
 
-    this.transitionTo(OrderStatus.COMPLETED);
+    this.transitionTo(OrderStatus.已取餐完成);
   }
 
   // 業務方法：標記失敗
   public fail(reason: string): void {
-    if (this._status !== OrderStatus.IN_PREPARATION) {
+    if (this._status !== OrderStatus.製作中) {
       throw new BusinessRuleError('僅能於「製作中」狀態標記失敗');
     }
 
-    this._status = OrderStatus.PREPARATION_FAILED;
+    this._status = OrderStatus.製作失敗;
     this._updatedAt = new Date();
     this._errorMessage = reason;
 
     this.addDomainEvent(new OrderStatusChangedEvent(
       this.id.value,
-      OrderStatus.IN_PREPARATION.value,
-      OrderStatus.PREPARATION_FAILED.value
+      OrderStatus.製作中.value,
+      OrderStatus.製作失敗.value
     ));
   }
 
   // 業務方法：確認訂單
   public confirm(): void {
-    this.transitionTo(OrderStatus.CONFIRMED);
+    this.transitionTo(OrderStatus.已確認訂單);
   }
 
   // 業務方法：開始製作
   public startPreparation(): void {
-    this.transitionTo(OrderStatus.IN_PREPARATION);
+    this.transitionTo(OrderStatus.製作中);
   }
 
   // 業務方法：標記為可取餐
   public markReadyForPickup(): void {
-    this.transitionTo(OrderStatus.READY_FOR_PICKUP);
+    this.transitionTo(OrderStatus.可取餐);
   }
 }

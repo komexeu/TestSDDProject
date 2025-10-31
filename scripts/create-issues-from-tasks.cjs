@@ -22,12 +22,23 @@ function parseTasksMd(filePath) {
   const content = fs.readFileSync(filePath, 'utf8');
   const lines = content.split('\n');
   const tasks = [];
+  let currentTask = null;
   for (const line of lines) {
     const match = line.match(/^[-*] \[ \] (.+)$/);
     if (match) {
-      tasks.push(match[1].trim());
+      if (currentTask) tasks.push(currentTask);
+      currentTask = { title: match[1].trim(), details: [] };
+    } else if (currentTask && /^\s{2,}[-*] (.+)$/.test(line)) {
+      // 解析二級子項目（兩個以上空白開頭）
+      const sub = line.replace(/^\s{2,}[-*] /, '').trim();
+      currentTask.details.push(sub);
+    } else if (currentTask && /^\s{1,}[-*] (.+)$/.test(line)) {
+      // 解析一級子項目（單一空白開頭）
+      const sub = line.replace(/^\s{1,}[-*] /, '').trim();
+      currentTask.details.push(sub);
     }
   }
+  if (currentTask) tasks.push(currentTask);
   return tasks;
 }
 
@@ -54,8 +65,12 @@ function main() {
   const specs = getAllSpecs();
   const existingIssues = getExistingIssues();
   for (const label of LABELS) ensureLabel(label);
+  ensureLabel('test');
 
   for (const spec of specs) {
+    // if (spec != '004-create-order')
+    //   continue;
+
     const featureLabel = spec;
     ensureLabel(featureLabel);
     const tasksPath = path.join(SPECS_DIR, spec, TASKS_MD);
@@ -79,7 +94,7 @@ function main() {
       console.log(`Skip sub-issues for ${spec} because main issue does not exist.`);
     } else {
       // 先建立一個 set 方便比對
-      const taskSet = new Set(tasks);
+      const taskSet = new Set(tasks.map(t => t.title));
       // 先處理現有 sub issue 是否有已被移除的
       for (const issue of existingIssues) {
         if (
@@ -99,14 +114,29 @@ function main() {
       }
       // 再處理新增 sub issue
       for (const task of tasks) {
-        const subIssueTitle = `[${featureLabel}] ${task}`;
+        const subIssueTitle = `[${featureLabel}] ${task.title}`;
         const exists = existingIssues.some(i => i.title === subIssueTitle && i.labels.some(l => l.name === featureLabel));
+        // T 開頭自動加 test label
+        const extraLabels = task.title.startsWith('T') ? ['test'] : [];
         if (exists) {
           console.log(`[${featureLabel}] Sub issue already exists: ${subIssueTitle}`);
+          // 如果 T 開頭但沒有 test 標籤，補上
+          if (extraLabels.includes('test')) {
+            const existing = existingIssues.find(i => i.title === subIssueTitle && i.labels.some(l => l.name === featureLabel));
+            if (existing && !existing.labels.some(l => l.name === 'test')) {
+              ensureLabel('test');
+              const cmd = `gh issue edit ${existing.number} --add-label "test"`;
+              execSync(cmd, { encoding: 'utf8' });
+              console.log(`Added test label to: ${subIssueTitle}`);
+            }
+          }
         } else {
           console.log(`[${featureLabel}] Creating sub issue: ${subIssueTitle}`);
-          const subBody = `Parent: #${mainIssueNumber}\n\nAuto-generated from ${spec}/tasks.md`;
-          createIssue(subIssueTitle, subBody, [...LABELS, featureLabel]);
+          let subBody = `Parent: #${mainIssueNumber}\n\nAuto-generated from ${spec}/tasks.md`;
+          if (task.details && task.details.length > 0) {
+            subBody += `\n\n**細項：**\n` + task.details.map(d => `- ${d}`).join('\n');
+          }
+          createIssue(subIssueTitle, subBody, [...LABELS, featureLabel, ...extraLabels]);
           console.log(`Created sub-issue: ${subIssueTitle}`);
         }
       }

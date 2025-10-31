@@ -1,11 +1,12 @@
-# Implementation Plan: [功能名稱]
 
-**Branch**: `[feature-branch]` | **Date**: [YYYY-MM-DD] | **Spec**: [spec.md](./spec.md)
-**Input**: 來自 specs/[feature-folder]/spec.md
+# Implementation Plan: 建立訂單
+
+**Branch**: `004-create-order` | **Date**: 2025-10-30 | **Spec**: [spec.md](./spec.md)
+**Input**: 來自 specs/004-create-order/spec.md
 
 ## Summary
 
-[功能摘要：描述此功能的核心目的、主要特色和技術實作方向。包含業務價值和技術方案概述。]
+本功能旨在讓用戶於系統中建立新訂單，支援商品選購、資料驗證、庫存檢查與訂單通知。採用 DDD 架構，分層設計，確保業務邏輯清晰、可維護。技術上以 TypeScript (Node.js) 為主，結合 Hono、Prisma、Vitest 與 PostgreSQL，確保資料一致性與高測試覆蓋率。此功能為訂單系統核心，直接影響後續出貨、庫存與金流流程，具高度業務價值。
 
 ## Technical Context
 

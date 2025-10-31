@@ -16,7 +16,7 @@
 - **ORM**: Prisma  
 - **Testing**: Vitest
 - **Database**: PostgreSQL
-- **Architecture**: DDD 清潔架構
+- **Architecture**: DDD 架構
 
 ### 2. 專案結構標準化
 ```
