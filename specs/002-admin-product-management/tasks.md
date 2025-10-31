@@ -21,10 +21,20 @@
 
 ## 測試 Tasks
 - [ ] T001 [P] [US1] 撰寫商品新增 API 單元測試（tests/models/productValidation.test.ts）
+	- 驗證商品新增時資料驗證規則正確。
+	- 驗證不合法資料時會正確拋出錯誤。
 - [ ] T002 [P] [US2] 撰寫商品編輯 API 測試（tests/models/productValidation.test.ts）
+	- 驗證商品編輯時資料驗證規則正確。
+	- 驗證不合法資料時會正確拋出錯誤。
 - [ ] T003 [P] [US3] 撰寫商品刪除 API 測試（tests/models/productValidation.test.ts）
+	- 驗證商品刪除流程正確。
+	- 驗證刪除不存在商品時會拋出錯誤。
 - [ ] T004 [P] [US4] 撰寫商品查詢/排序/篩選 API 測試（tests/models/productValidation.test.ts）
+	- 驗證商品查詢、排序、篩選功能正確。
+	- 驗證查詢不存在商品時會拋出錯誤。
 - [ ] T005 [P] 撰寫商品資料驗證與權限測試（tests/models/productValidation.test.ts）
+	- 驗證商品資料驗證規則與權限驗證正確。
+	- 驗證權限不足時會正確拋出錯誤。
 
 ## 文件與同步 Tasks
 - [ ] D001 補充 data-model.md 與 API 文件（specs/002-admin-product-management/data-model.md, contracts/openapi.yaml）

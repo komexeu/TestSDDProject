@@ -1,14 +1,28 @@
-// 解析所有 specs/*/tasks.md，將未勾選的 checklist 轉為 GitHub issue
+
+// --- 型別定義 ---
+/**
+ * @typedef {Object} Task
+ * @property {string} title
+ * @property {string[]} details
+ */
+
+/**
+ * @typedef {Object} SpecInfo
+ * @property {string} name
+ * @property {Task[]} tasks
+ */
+
+/**
+ * @typedef {Object} Issue
+ * @property {number} number
+ * @property {string} title
+ * @property {string} body
+ * @property {Array<{name: string}>} labels
+ */
 
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
-
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-if (!GITHUB_TOKEN) {
-  console.error('GITHUB_TOKEN is required');
-  process.exit(1);
-}
 
 const SPECS_DIR = path.join(__dirname, '../specs');
 const TASKS_MD = 'tasks.md';
@@ -18,6 +32,11 @@ function getAllSpecs() {
   return fs.readdirSync(SPECS_DIR).filter(f => fs.statSync(path.join(SPECS_DIR, f)).isDirectory());
 }
 
+/**
+ * 解析 tasks.md，回傳 Task[]
+ * @param {string} filePath
+ * @returns {Task[]}
+ */
 function parseTasksMd(filePath) {
   const content = fs.readFileSync(filePath, 'utf8');
   const lines = content.split('\n');
@@ -29,11 +48,9 @@ function parseTasksMd(filePath) {
       if (currentTask) tasks.push(currentTask);
       currentTask = { title: match[1].trim(), details: [] };
     } else if (currentTask && /^\s{2,}[-*] (.+)$/.test(line)) {
-      // 解析二級子項目（兩個以上空白開頭）
       const sub = line.replace(/^\s{2,}[-*] /, '').trim();
       currentTask.details.push(sub);
     } else if (currentTask && /^\s{1,}[-*] (.+)$/.test(line)) {
-      // 解析一級子項目（單一空白開頭）
       const sub = line.replace(/^\s{1,}[-*] /, '').trim();
       currentTask.details.push(sub);
     }
@@ -42,11 +59,109 @@ function parseTasksMd(filePath) {
   return tasks;
 }
 
+/**
+ * 取得現有 GitHub issues
+ * @returns {Issue[]}
+ */
 function getExistingIssues() {
   const out = execSync('gh issue list --state all --limit 9000 --json title,number,body,labels', { encoding: 'utf8' });
   return JSON.parse(out);
 }
 
+/**
+ * 整理所有 specs 與 tasks
+ * @returns {SpecInfo[]}
+ */
+function collectSpecsAndTasks() {
+  const specs = getAllSpecs();
+  const result = [];
+  for (const spec of specs) {
+    const tasksPath = path.join(SPECS_DIR, spec, TASKS_MD);
+    if (!fs.existsSync(tasksPath)) continue;
+    const tasks = parseTasksMd(tasksPath);
+    result.push({ name: spec, tasks });
+  }
+  return result;
+}
+
+/**
+ * 比對 specs/tasks 與 issues，產生比對報告
+ * @param {SpecInfo[]} specs
+ * @param {Issue[]} issues
+ * @returns {any[]}
+ */
+function diffSpecsAndIssues(specs, issues) {
+  const report = [];
+  for (const spec of specs) {
+    const featureLabel = spec.name;
+    const mainIssueTitle = `[${featureLabel}] Feature`;
+    const mainIssue = issues.find(i => i.title === mainIssueTitle && i.labels.some(l => l.name === featureLabel));
+    const mainIssueNumber = mainIssue ? mainIssue.number : null;
+    const subIssues = issues.filter(i => i.title.startsWith(`[${featureLabel}] `) && i.labels.some(l => l.name === featureLabel) && i.title !== mainIssueTitle);
+    const taskSet = new Set(spec.tasks.map(t => t.title));
+    // 比對主 issue
+    report.push({
+      type: 'main',
+      spec: featureLabel,
+      exists: !!mainIssue,
+      issue: mainIssue || null
+    });
+    // 比對 sub issue
+    for (const task of spec.tasks) {
+      const subIssueTitle = `[${featureLabel}] ${task.title}`;
+      const subIssue = subIssues.find(i => i.title === subIssueTitle);
+      let needTestLabel = task.title.startsWith('T');
+      let hasTestLabel = subIssue && subIssue.labels.some(l => l.name === 'test');
+      // 細項內容比對
+      let newSubBody = `Parent: #${mainIssueNumber}\n\nAuto-generated from ${featureLabel}/tasks.md`;
+      if (task.details && task.details.length > 0) {
+        newSubBody += `\n\n**細項：**\n` + task.details.map(d => `- ${d}`).join('\n');
+      }
+      let bodyDiff = subIssue && subIssue.body !== newSubBody;
+      report.push({
+        type: 'sub',
+        spec: featureLabel,
+        title: task.title,
+        exists: !!subIssue,
+        needTestLabel,
+        hasTestLabel,
+        bodyDiff,
+        subIssue: subIssue || null
+      });
+    }
+    // 比對已被移除的 sub issue
+    for (const sub of subIssues) {
+      const taskTitle = sub.title.replace(`[${featureLabel}] `, '');
+      if (!taskSet.has(taskTitle) && !sub.labels.some(l => l.name === 'remove')) {
+        report.push({
+          type: 'removed',
+          spec: featureLabel,
+          title: taskTitle,
+          issue: sub
+        });
+      }
+    }
+  }
+  return report;
+}
+
+
+function printReport(report) {
+  for (const item of report) {
+    if (item.type === 'main') {
+      console.log(`[${item.spec}] 主 issue: ${item.exists ? '存在' : '缺少'}`);
+    } else if (item.type === 'sub') {
+      let msg = `  [${item.spec}] 子任務: ${item.title} - ${item.exists ? '存在' : '缺少'}`;
+      if (item.needTestLabel && !item.hasTestLabel) msg += ' (需補 test label)';
+      if (item.bodyDiff) msg += ' (細項內容不同)';
+      console.log(msg);
+    } else if (item.type === 'removed') {
+      console.log(`  [${item.spec}] 已移除 checklist: ${item.title} (需標記 remove)`);
+    }
+  }
+}
+
+// --- GitHub 操作 ---
 function ensureLabel(label) {
   try {
     execSync(`gh label create "${label}" --force`, { stdio: 'ignore' });
@@ -61,98 +176,77 @@ function createIssue(title, body, labels) {
   return match ? parseInt(match[1], 10) : null;
 }
 
-function main() {
-  const specs = getAllSpecs();
-  const existingIssues = getExistingIssues();
+function addLabelToIssue(number, label) {
+  ensureLabel(label);
+  execSync(`gh issue edit ${number} --add-label "${label}"`, { encoding: 'utf8' });
+}
+
+function updateIssueBody(number, body) {
+  execSync(`gh issue edit ${number} --body "${body.replace(/"/g, '\"')}"`, { encoding: 'utf8' });
+}
+
+// --- 執行所有 GitHub 操作 ---
+function applyActions(report, specs, issues) {
+  // 先確保全域 label
   for (const label of LABELS) ensureLabel(label);
   ensureLabel('test');
+  ensureLabel('remove');
 
-  for (const spec of specs) {
-    // if (spec != '004-create-order')
-    //   continue;
-
-    const featureLabel = spec;
-    ensureLabel(featureLabel);
-    const tasksPath = path.join(SPECS_DIR, spec, TASKS_MD);
-    if (!fs.existsSync(tasksPath)) continue;
-    // 1. 主 issue: 以 spec 名稱為標題
-    const mainIssueTitle = `[${featureLabel}] Feature`;
-    let mainIssue = existingIssues.find(i => i.title === mainIssueTitle && i.labels.some(l => l.name === featureLabel));
-    let mainIssueNumber = mainIssue ? mainIssue.number : null;
-    if (mainIssueNumber) {
-      console.log(`Main issue already exists: ${mainIssueTitle} (#${mainIssueNumber})`);
-    } else {
-      mainIssueNumber = createIssue(mainIssueTitle, `Auto-generated main issue for ${spec}\n\n此 issue 代表 ${spec} 的主功能，所有子任務請見 sub-issues。`, [...LABELS, featureLabel]);
-      console.log(`Created main issue: ${mainIssueTitle} (#${mainIssueNumber})`);
-      // 重新取得 existingIssues 以便 reference
-      existingIssues.push({ title: mainIssueTitle, number: mainIssueNumber, labels: [{ name: featureLabel }] });
+  for (const item of report) {
+    if (item.type === 'main' && !item.exists) {
+      // 建立主 issue
+      const mainIssueTitle = `[${item.spec}] Feature`;
+      const body = `Auto-generated main issue for ${item.spec}\n\n此 issue 代表 ${item.spec} 的主功能，所有子任務請見 sub-issues。`;
+      const labels = [...LABELS, item.spec];
+      const number = createIssue(mainIssueTitle, body, labels);
+      console.log(`Created main issue: ${mainIssueTitle} (#${number})`);
     }
-
-    // 2. sub issue: checklist
-    const tasks = parseTasksMd(tasksPath);
-    if (!mainIssueNumber) {
-      console.log(`Skip sub-issues for ${spec} because main issue does not exist.`);
-    } else {
-      // 先建立一個 set 方便比對
-      const taskSet = new Set(tasks.map(t => t.title));
-      // 先處理現有 sub issue 是否有已被移除的
-      for (const issue of existingIssues) {
-        if (
-          issue.title.startsWith(`[${featureLabel}] `) &&
-          issue.labels.some(l => l.name === featureLabel) &&
-          issue.title !== `[${featureLabel}] Feature`
-        ) {
-          const taskTitle = issue.title.replace(`[${featureLabel}] `, '');
-          if (!taskSet.has(taskTitle) && !issue.labels.some(l => l.name === 'remove')) {
-            // 標記 remove label
-            ensureLabel('remove');
-            const cmd = `gh issue edit ${issue.number} --add-label "remove"`;
-            execSync(cmd, { encoding: 'utf8' });
-            console.log(`Marked sub-issue as removed: ${issue.title}`);
-          }
+    if (item.type === 'sub') {
+      const featureLabel = item.spec;
+      const subIssueTitle = `[${featureLabel}] ${item.title}`;
+      const mainIssue = issues.find(i => i.title === `[${featureLabel}] Feature` && i.labels.some(l => l.name === featureLabel));
+      const mainIssueNumber = mainIssue ? mainIssue.number : null;
+      let subBody = `Parent: #${mainIssueNumber}\n\nAuto-generated from ${featureLabel}/tasks.md`;
+      const specObj = specs.find(s => s.name === featureLabel);
+      const task = specObj ? specObj.tasks.find(t => t.title === item.title) : null;
+      if (task && task.details && task.details.length > 0) {
+        subBody += `\n\n**細項：**\n` + task.details.map(d => `- ${d}`).join('\n');
+      }
+      // 新增 sub issue
+      if (!item.exists) {
+        const extraLabels = item.needTestLabel ? ['test'] : [];
+        createIssue(subIssueTitle, subBody, [...LABELS, featureLabel, ...extraLabels]);
+        console.log(`Created sub-issue: ${subIssueTitle}`);
+      } else {
+        // 補 test label
+        if (item.needTestLabel && !item.hasTestLabel && item.subIssue) {
+          addLabelToIssue(item.subIssue.number, 'test');
+          console.log(`Added test label to: ${subIssueTitle}`);
+        }
+        // 更新細項內容
+        if (item.bodyDiff && item.subIssue) {
+          updateIssueBody(item.subIssue.number, subBody);
+          console.log(`Updated sub-issue body: ${subIssueTitle}`);
         }
       }
-      // 再處理新增 sub issue
-      for (const task of tasks) {
-        const subIssueTitle = `[${featureLabel}] ${task.title}`;
-        const exists = existingIssues.some(i => i.title === subIssueTitle && i.labels.some(l => l.name === featureLabel));
-        // T 開頭自動加 test label
-        const extraLabels = task.title.startsWith('T') ? ['test'] : [];
-        if (exists) {
-          console.log(`[${featureLabel}] Sub issue already exists: ${subIssueTitle}`);
-          // 如果 T 開頭但沒有 test 標籤，補上
-          const existing = existingIssues.find(i => i.title === subIssueTitle && i.labels.some(l => l.name === featureLabel));
-          if (extraLabels.includes('test')) {
-            if (existing && !existing.labels.some(l => l.name === 'test')) {
-              ensureLabel('test');
-              const cmd = `gh issue edit ${existing.number} --add-label "test"`;
-              execSync(cmd, { encoding: 'utf8' });
-              console.log(`Added test label to: ${subIssueTitle}`);
-            }
-          }
-          // 檢查細項有無變更，若有則更新 subbody
-          let newSubBody = `Parent: #${mainIssueNumber}\n\nAuto-generated from ${spec}/tasks.md`;
-          if (task.details && task.details.length > 0) {
-            newSubBody += `\n\n**細項：**\n` + task.details.map(d => `- ${d}`).join('\n');
-          }
-          // 只在細項內容不同時才更新 body
-          if (existing && existing.body !== newSubBody) {
-            const cmd = `gh issue edit ${existing.number} --body "${newSubBody.replace(/"/g, '\\"').replace(/\n/g, '\\n')}"`;
-            execSync(cmd, { encoding: 'utf8' });
-            console.log(`Updated sub-issue body: ${subIssueTitle}`);
-          }
-        } else {
-          console.log(`[${featureLabel}] Creating sub issue: ${subIssueTitle}`);
-          let subBody = `Parent: #${mainIssueNumber}\n\nAuto-generated from ${spec}/tasks.md`;
-          if (task.details && task.details.length > 0) {
-            subBody += `\n\n**細項：**\n` + task.details.map(d => `- ${d}`).join('\n');
-          }
-          createIssue(subIssueTitle, subBody, [...LABELS, featureLabel, ...extraLabels]);
-          console.log(`Created sub-issue: ${subIssueTitle}`);
-        }
-      }
+    }
+    if (item.type === 'removed' && item.issue) {
+      addLabelToIssue(item.issue.number, 'remove');
+      console.log(`Marked sub-issue as removed: ${item.issue.title}`);
     }
   }
+}
+
+function main() {
+  const args = process.argv.slice(2);
+  const doAction = args.includes('--apply') || args.includes('-a');
+  const specs = collectSpecsAndTasks();
+  const issues = getExistingIssues();
+  const report = diffSpecsAndIssues(specs, issues);
+  printReport(report);
+
+  console.log('\n---\n執行 GitHub 操作...');
+  applyActions(report, specs, issues);
 }
 
 main();

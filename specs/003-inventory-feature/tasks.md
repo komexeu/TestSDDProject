@@ -26,11 +26,26 @@ description: "Task list for 003-inventory-feature (多前綴分區塊)"
 
 ## 測試 Tasks
 - [ ] T001 [P] [US1] 撰寫商品庫存查詢 API 單元測試（tests/inventory/inventory-stock.test.ts）
+	- 驗證可正確查詢指定商品的庫存數量，並檢查回傳欄位（productId, quantity, updatedAt）。
+	- 測試查詢不存在商品時會正確拋出錯誤。
 - [ ] T002 [P] [US2] 撰寫庫存調整 API 單元測試（tests/inventory/inventory-adjust.test.ts）
+	- 驗證可正確調整商品庫存，並檢查調整後的庫存數量。
+	- 測試庫存不可為負數，負數時應拋出「庫存不可為負數」錯誤。
+	- 測試調整不存在商品時應拋出「查無商品」錯誤。
 - [ ] T003 [P] [US3] 撰寫銷售自動扣庫存 API 單元測試（tests/inventory/inventory-sale.test.ts）
+	- 驗證銷售時可正確扣除庫存，並檢查剩餘庫存與銷售數量。
+	- 測試庫存不足時應拋出「庫存不足」錯誤。
+	- 測試銷售不存在商品時應拋出「查無商品」錯誤。
 - [ ] T004 [P] [US3] 撰寫高併發下超賣防護測試（tests/inventory/inventory-concurrency.test.ts）
+	- 驗證多併發下同時扣庫存時，不會發生超賣（最多僅有庫存數量的請求成功，其餘失敗）。
+	- 測試最終庫存為 0，成功與失敗請求數量正確。
 - [ ] T005 [P] [US3] 撰寫庫存異常錯誤處理測試（tests/inventory/inventory-stock.test.ts）
+	- 驗證調整庫存為負數時會拋出錯誤。
+	- 驗證銷售庫存不足時會拋出錯誤。
+	- 驗證查詢不存在商品時會拋出錯誤。
 - [ ] T006 [P] [US4] 撰寫庫存異動紀錄查詢 API 測試（tests/inventory/inventory-logs.test.ts）
+	- 驗證可查詢指定商品的所有庫存異動紀錄，並檢查紀錄欄位（beforeQuantity, afterQuantity, delta, reason, operator, createdAt）。
+	- 測試異動紀錄數量與內容正確，異動原因與操作人正確。
 
 ## 文件與同步 Tasks
 - [ ] D001 補充 data-model.md 與 API 文件（specs/003-inventory-feature/data-model.md, contracts/openapi.yaml）
