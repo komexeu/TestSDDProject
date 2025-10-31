@@ -23,11 +23,11 @@ describe('訂單核心功能', () => {
     it('訂單狀態可依流程正確流轉', () => {
         const order = Order.create(userId, items);
         // 狀態流轉：已點餐 → 已確認訂單 → 製作中 → 可取餐 → 已取餐完成
-        order.transitionTo(OrderStatus.CONFIRMED);
+        order.transitionTo(OrderStatus.已確認訂單);
         expect(order.status.value).toBe('已確認訂單');
         order.startPreparation();
         expect(order.status.value).toBe('製作中');
-        order.transitionTo(OrderStatus.READY_FOR_PICKUP);
+        order.transitionTo(OrderStatus.可取餐);
         expect(order.status.value).toBe('可取餐');
         order.complete();
         expect(order.status.value).toBe('已取餐完成');
@@ -40,7 +40,7 @@ describe('訂單核心功能', () => {
 
     it('不可從「已點餐」直接轉到「已取餐完成」', () => {
         const order = Order.create(userId, items);
-        expect(() => order.transitionTo(OrderStatus.COMPLETED)).toThrow();
+        expect(() => order.transitionTo(OrderStatus.已取餐完成)).toThrow();
     });
 
     it('訂單可於「已點餐」或「已確認訂單」狀態取消', () => {
@@ -52,16 +52,16 @@ describe('訂單核心功能', () => {
 
     it('不可於「可取餐」後再取消訂單', () => {
         const order = Order.create(userId, items);
-        order.transitionTo(OrderStatus.CONFIRMED);
+        order.transitionTo(OrderStatus.已確認訂單);
         order.startPreparation();
-        order.transitionTo(OrderStatus.READY_FOR_PICKUP);
+        order.transitionTo(OrderStatus.可取餐);
         expect(order.status.value).toBe('可取餐');
         expect(() => order.cancel('user')).toThrow();
     });
 
     it('製作中失敗應進入「製作失敗」狀態', () => {
         const order = Order.create(userId, items);
-        order.transitionTo(OrderStatus.CONFIRMED);
+        order.transitionTo(OrderStatus.已確認訂單);
         order.startPreparation();
         order.fail('原料不足');
         expect(order.status.value).toBe('製作失敗');

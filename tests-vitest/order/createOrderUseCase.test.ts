@@ -1,10 +1,14 @@
 
+
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { CreateOrderUseCase } from '../../src/domains/order/application/use-cases/create-order';
 import { PrismaOrderRepository } from '../../src/domains/order/infrastructure/repositories/order-repository.prisma';
 import { InMemoryDomainEventPublisher } from '../../src/shared/domain/events/domain-event';
 import { CreateOrderRequest } from '../../src/domains/order/application/dto/order-dto';
 import { PrismaClient } from '@prisma/client';
+import { Order, UserId } from '../../src/domains/order/domain/entities/order';
+import { OrderStatus } from '../../src/domains/order/domain/value-objects/order-status';
+import { OrderItem } from '../../src/domains/order/domain/value-objects/order-item';
 
 const prisma = new PrismaClient();
 
@@ -21,6 +25,36 @@ describe('CreateOrderUseCase', () => {
         orderRepository = new PrismaOrderRepository();
         eventPublisher = new InMemoryDomainEventPublisher();
         useCase = new CreateOrderUseCase(orderRepository, eventPublisher);
+    });
+
+    it('建立訂單後可正確流轉狀態', () => {
+        const userId = new UserId('U002');
+        const items = [new OrderItem('P003', '綠茶', 1, 50)];
+        const order = Order.create(userId, items);
+        expect(order.status.value).toBe('已點餐');
+        order.transitionTo(OrderStatus.已確認訂單);
+        expect(order.status.value).toBe('已確認訂單');
+        order.startPreparation();
+        expect(order.status.value).toBe('製作中');
+        order.transitionTo(OrderStatus.可取餐);
+        expect(order.status.value).toBe('可取餐');
+        order.complete();
+        expect(order.status.value).toBe('已取餐完成');
+    });
+
+    it('異常狀態流轉時應拋出例外', () => {
+        const userId = new UserId('U003');
+        const items = [new OrderItem('P004', '烏龍茶', 1, 55)];
+        const order = Order.create(userId, items);
+        // 不可直接完成訂單
+        expect(() => order.complete()).toThrow();
+        // 不可直接轉到已取餐完成
+        expect(() => order.transitionTo(OrderStatus.已取餐完成)).toThrow();
+        // 狀態錯誤下取消
+        order.transitionTo(OrderStatus.已確認訂單);
+        order.startPreparation();
+        order.transitionTo(OrderStatus.可取餐);
+        expect(() => order.cancel('user')).toThrow();
     });
 
     afterEach(async () => {
