@@ -1,3 +1,12 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
 /// 訂單主檔
 model Order {
   /// 訂單唯一編號
@@ -14,38 +23,11 @@ model Order {
   updatedAt   DateTime     @updatedAt
   /// 訂單明細
   items       OrderItem[]
+  /// 是否已刪除（軟刪除）
+  isDelete    Boolean      @default(false)
 }
 
-/// 訂單明細
-model OrderItem {
-  /// 明細唯一編號
-  id        String   @id @default(uuid())
-  /// 所屬訂單
-  order     Order    @relation(fields: [orderId], references: [id])
-  /// 訂單 id
-  orderId   String
-  /// 商品 id
-  productId String
-  /// 商品名稱
-  name      String
-  /// 數量
-  quantity  Int
-  /// 商品單價
-  price     Int
-  /// 小計（單價*數量）
-  totalPrice Int
-}
 // Prisma schema for 商品管理
-
-generator client {
-  provider = "prisma-client-js"
-}
-
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
 model Product {
   /// 商品唯一編號（純數字字串）
   id          String         @id @default(uuid())
@@ -67,6 +49,30 @@ model Product {
   isActive    Boolean        @default(true)
   /// 商品庫存異動紀錄
   logs        InventoryLog[]
+  /// 訂單明細
+  items       OrderItem[]
+}
+
+/// 訂單明細
+model OrderItem {
+  /// 明細唯一編號
+  id        String   @id @default(uuid())
+  /// 所屬訂單
+  order     Order    @relation(fields: [orderId], references: [id])
+  /// 訂單 id
+  orderId   String
+  /// 關聯商品
+  product   Product  @relation(fields: [productId], references: [id])
+  /// 商品 id
+  productId String
+  /// 商品名稱
+  name      String
+  /// 數量
+  quantity  Int
+  /// 商品單價
+  price     Int
+  /// 小計（單價*數量）
+  totalPrice Int
 }
 
 model InventoryLog {

@@ -19,7 +19,7 @@ export class OrderStatus extends ValueObject<string> {
     ];
     
     if (!validStatuses.includes(value)) {
-      throw new Error(`Invalid order status: ${value}`);
+      throw new Error(`無效的訂單狀態：${value}`);
     }
     super(value);
   }

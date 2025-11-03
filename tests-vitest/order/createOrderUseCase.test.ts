@@ -4,7 +4,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { CreateOrderUseCase } from '../../src/domains/order/application/use-cases/create-order';
 import { PrismaOrderRepository } from '../../src/domains/order/infrastructure/repositories/order-repository.prisma';
 import { InMemoryDomainEventPublisher } from '../../src/shared/domain/events/domain-event';
-import { CreateOrderRequest } from '../../src/domains/order/application/dto/order-dto';
+import { CreateOrderRequest } from '../../src/domains/order/application/dto/order-service.dto';
 import { PrismaClient } from '@prisma/client';
 import { Order, UserId } from '../../src/domains/order/domain/entities/order';
 import { OrderStatus } from '../../src/domains/order/domain/value-objects/order-status';

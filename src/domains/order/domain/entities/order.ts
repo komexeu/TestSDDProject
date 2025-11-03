@@ -1,7 +1,7 @@
 import { AggregateRoot } from '../../../../shared/domain/entities/base';
 import { Id } from '../../../../shared/domain/value-objects/common';
 import { OrderStatus } from '../value-objects/order-status';
-import { OrderStateMachineService } from '../services/orderStateMachineService';
+import { OrderStateMachineService } from '../services/order-state-mechine-service';
 import { OrderItem } from '../value-objects/order-item';
 import { BusinessRuleError } from '../../../../shared/application/exceptions';
 import { DomainEvent } from '../../../../shared/domain/events/domain-event';
@@ -95,7 +95,7 @@ export class Order extends AggregateRoot<OrderId> {
     errorMessage?: string | null
   ) {
     super(id);
-    
+
     if (!items || items.length === 0) {
       throw new BusinessRuleError('訂單必須包含至少一項餐點');
     }
@@ -153,7 +153,11 @@ export class Order extends AggregateRoot<OrderId> {
     return this._items.reduce((total, item) => total + item.totalPrice, 0);
   }
 
-  // 業務方法：狀態轉換
+  /**
+   * 狀態轉換（內部使用）
+   * @param newStatus 新狀態
+   * @throws BusinessRuleError 狀態轉換不合法時
+   */
   public transitionTo(newStatus: OrderStatus): void {
     // 使用 OrderStateMachineService 進行狀態轉換驗證
     OrderStateMachineService.prototype.validateTransition(this, newStatus);
@@ -170,7 +174,12 @@ export class Order extends AggregateRoot<OrderId> {
     ));
   }
 
-  // 業務方法：取消訂單
+  /**
+   * 業務方法：取消訂單
+   * 僅能於「已點餐」或「已確認訂單」狀態取消訂單
+   * @param cancelledBy 取消者（user/counter）
+   * @throws BusinessRuleError 狀態不符時
+   */
   public cancel(cancelledBy: 'user' | 'counter'): void {
 
     if (!this.canBeCancelled()) {
@@ -185,8 +194,12 @@ export class Order extends AggregateRoot<OrderId> {
     this.addDomainEvent(new OrderCancelledEvent(this.id.value, cancelledBy));
   }
 
-  // 業務方法：完成訂單
-  public complete(): void {
+  /**
+   * 業務方法：完成訂單
+   * 僅能於「可取餐」狀態完成訂單
+   * @throws BusinessRuleError 狀態不符時
+   */
+  public setComplete(): void {
     if (this._status !== OrderStatus.可取餐) {
       throw new BusinessRuleError('僅能於「可取餐」狀態完成訂單');
     }
@@ -194,8 +207,13 @@ export class Order extends AggregateRoot<OrderId> {
     this.transitionTo(OrderStatus.已取餐完成);
   }
 
-  // 業務方法：標記失敗
-  public fail(reason: string): void {
+  /**
+   * 業務方法：標記失敗
+   * 僅能於「製作中」狀態標記失敗
+   * @param reason 失敗原因
+   * @throws BusinessRuleError 狀態不符時
+   */
+  public setFail(reason: string): void {
     if (this._status !== OrderStatus.製作中) {
       throw new BusinessRuleError('僅能於「製作中」狀態標記失敗');
     }
@@ -211,18 +229,31 @@ export class Order extends AggregateRoot<OrderId> {
     ));
   }
 
-  // 業務方法：確認訂單
-  public confirm(): void {
+  /**
+   * 業務方法：確認訂單
+   * 狀態轉換為「已確認訂單」
+   * @throws BusinessRuleError 狀態轉換不合法時
+   */
+  public setConfirm(): void {
     this.transitionTo(OrderStatus.已確認訂單);
   }
 
-  // 業務方法：開始製作
-  public startPreparation(): void {
+  
+  /**
+   * 業務方法：開始製作
+   * 狀態轉換為「製作中」
+   * @throws BusinessRuleError 狀態轉換不合法時
+   */
+  public setStartPreparation(): void {
     this.transitionTo(OrderStatus.製作中);
   }
 
-  // 業務方法：標記為可取餐
-  public markReadyForPickup(): void {
+  /**
+   * 業務方法：標記為可取餐
+   * 狀態轉換為「可取餐」
+   * @throws BusinessRuleError 狀態轉換不合法時
+   */
+  public setMarkReadyForPickup(): void {
     this.transitionTo(OrderStatus.可取餐);
   }
 }
