@@ -3,7 +3,7 @@ import { TransitionOrderStatusRequest, TransitionOrderStatusResponse } from '../
 import { OrderRepository } from '../../domain/repositories/order-repository';
 import { OrderId } from '../../domain/entities/order';
 import { OrderStatus } from '../../domain/value-objects/order-status';
-import { OrderStateMachineService } from '../../domain/services/order-state-machine';
+import { OrderStateMachineService } from '../../domain/services/orderStateMachineService';
 import { DomainEventPublisher } from '../../../../shared/domain/events/domain-event';
 import { NotFoundError, ValidationError } from '../../../../shared/application/exceptions';
 

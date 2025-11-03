@@ -1,7 +1,7 @@
 import { AggregateRoot } from '../../../../shared/domain/entities/base';
 import { Id } from '../../../../shared/domain/value-objects/common';
 import { OrderStatus } from '../value-objects/order-status';
-import { OrderStateMachineService } from '../services/OrderStateMachineService';
+import { OrderStateMachineService } from '../services/orderStateMachineService';
 import { OrderItem } from '../value-objects/order-item';
 import { BusinessRuleError } from '../../../../shared/application/exceptions';
 import { DomainEvent } from '../../../../shared/domain/events/domain-event';
@@ -63,6 +63,19 @@ export class OrderCancelledEvent implements DomainEvent {
 
 // 訂單聚合根
 export class Order extends AggregateRoot<OrderId> {
+  /**
+   * 是否可取消（委派狀態機服務）
+   */
+  public canBeCancelled(): boolean {
+    return OrderStateMachineService.prototype.canBeCancelled(this);
+  }
+
+  /**
+   * 是否處理中（委派狀態機服務）
+   */
+  public isInProgress(): boolean {
+    return OrderStateMachineService.prototype.isInProgress(this);
+  }
   private _userId: UserId;
   private _status: OrderStatus;
   private _items: OrderItem[];
@@ -159,7 +172,8 @@ export class Order extends AggregateRoot<OrderId> {
 
   // 業務方法：取消訂單
   public cancel(cancelledBy: 'user' | 'counter'): void {
-    if (!this._status.isCancellable()) {
+
+    if (!this.canBeCancelled()) {
       throw new BusinessRuleError('僅能於「已點餐」或「已確認訂單」狀態取消訂單');
     }
 

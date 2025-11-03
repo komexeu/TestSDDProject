@@ -54,13 +54,22 @@ export class OrderStateMachineService {
    * 檢查訂單是否可以被取消
    */
   public canBeCancelled(order: Order): boolean {
-    return order.status.isCancellable();
+    // 僅「已點餐」或「已確認訂單」可取消
+    return (
+      order.status.value === OrderStatus.已點餐.value ||
+      order.status.value === OrderStatus.已確認訂單.value
+    );
   }
 
   /**
    * 檢查訂單是否還在處理中
    */
   public isInProgress(order: Order): boolean {
-    return order.status.isActive();
+    // 「已點餐」「已確認訂單」「製作中」視為處理中
+    return [
+      OrderStatus.已點餐.value,
+      OrderStatus.已確認訂單.value,
+      OrderStatus.製作中.value
+    ].includes(order.status.value);
   }
 }

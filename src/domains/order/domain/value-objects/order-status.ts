@@ -23,13 +23,4 @@ export class OrderStatus extends ValueObject<string> {
     }
     super(value);
   }
-
-
-  public isActive(): boolean {
-    return !['已取餐完成', '已取消', '製作失敗'].includes(this._value);
-  }
-
-  public isCancellable(): boolean {
-    return ['已點餐', '已確認訂單'].includes(this._value);
-  }
 }

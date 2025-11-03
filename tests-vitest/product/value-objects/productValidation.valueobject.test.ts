@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { validateProductInput } from '../../src/models/productValidation';
+import { validateProductInput } from '../../../src/models/productValidation';
 
 describe('validateProductInput', () => {
   it('應通過正確資料', () => {
