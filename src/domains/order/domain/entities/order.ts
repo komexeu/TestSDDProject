@@ -83,6 +83,7 @@ export class Order extends AggregateRoot<OrderId> {
     return OrderStateMachineService.prototype.isInProgress(this);
   }
   private _userId: UserId;
+  private _description: string;
   private _status: OrderStatus;
   private _items: OrderItem[];
   private _createdAt: Date;
@@ -94,6 +95,7 @@ export class Order extends AggregateRoot<OrderId> {
     id: OrderId,
     userId: UserId,
     items: OrderItem[],
+    description: string = '',
     status?: OrderStatus,
     createdAt?: Date,
     updatedAt?: Date,
@@ -107,6 +109,7 @@ export class Order extends AggregateRoot<OrderId> {
     }
 
     this._userId = userId;
+    this._description = description ?? '';
     this._items = [...items];
     this._status = status || OrderStatus.已點餐;
     this._createdAt = createdAt || new Date();
@@ -121,9 +124,12 @@ export class Order extends AggregateRoot<OrderId> {
   }
 
   // 靜態工廠方法：建立新訂單
-  public static create(userId: UserId, items: OrderItem[]): Order {
+  public static create(userId: UserId, items: OrderItem[], description: string = ''): Order {
     const orderId = new OrderId(Id.generate().value);
-    return new Order(orderId, userId, items);
+    return new Order(orderId, userId, items, description);
+  }
+  get description(): string {
+    return this._description;
   }
 
   // Getters
@@ -206,7 +212,7 @@ export class Order extends AggregateRoot<OrderId> {
    * @throws BusinessRuleError 狀態不符時
    */
   public setComplete(): void {
-    if (this._status !== OrderStatus.可取餐) {
+    if (this._status.value !== OrderStatus.可取餐.value) {
       throw new BusinessRuleError('僅能於「可取餐」狀態完成訂單');
     }
 
@@ -220,7 +226,7 @@ export class Order extends AggregateRoot<OrderId> {
    * @throws BusinessRuleError 狀態不符時
    */
   public setFail(reason: string): void {
-    if (this._status !== OrderStatus.製作中) {
+    if (this._status.value !== OrderStatus.製作中.value) {
       throw new BusinessRuleError('僅能於「製作中」狀態標記失敗');
     }
 
@@ -244,7 +250,7 @@ export class Order extends AggregateRoot<OrderId> {
     this.transitionTo(OrderStatus.已確認訂單);
   }
 
-  
+
   /**
    * 業務方法：開始製作
    * 狀態轉換為「製作中」

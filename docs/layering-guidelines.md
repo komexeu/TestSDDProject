@@ -25,7 +25,13 @@ src/
 
 # 分層設計與檔案結構指引（2025）
 
+## 1. 分層總覽
+
+1. **Domain Layer**（領域層）
+   - entities/：聚合根、實體，封裝業務邏輯與狀態、事件觸發
+   - value-objects/：值物件，描述不可變的業務屬性
    - repositories/：Repository 介面，僅定義 CRUD 與查詢，回傳/接收 domain entity
+   - events/：領域事件型別
    - services/：Domain Service，純商業規則，無基礎設施依賴
 
 2. **Application Layer**（應用層）
@@ -69,82 +75,8 @@ src/
 
 src/
 ├── domains/
+│   └── order/
 │       ├── application/
-## 測試（Testing）
-
-### 原則
-- 每個 Domain Entity、Use Case、Service 都應有對應的單元測試。
-- Infrastructure 層可用整合測試驗證與外部系統（如 DB）互動。
-- 測試命名與目錄結構應與原始碼對應。
-
-### 範例：Order Aggregate 單元測試
-
-```ts
-// tests-vitest/order/orderCore.test.ts
-import { Order } from '../../src/domains/order/domain/entities/order';
-
-describe('Order Aggregate', () => {
-  it('建立訂單時，狀態應為 CREATED', () => {
-    const order = Order.create({ /* ...必要參數... */ });
-    expect(order.status).toBe('CREATED');
-  });
-});
-```
-
----
-
-## 文件與註解標準（Documentation & JSDoc）
-
-### 原則
-- 所有公開類別、方法、DTO 必須加上 JSDoc。
-- 註解需說明用途、參數、回傳值、例外狀況。
-- 文件需同步維護於 `/docs`，並與程式碼一致。
-
-### 範例：JSDoc 註解
-
-```ts
-/**
- * 訂單聚合根
- * @class
- */
-export class Order {
-  /**
-   * 建立訂單
-   * @param input 建立訂單所需參數
-   * @returns Order 實例
-   */
-  static create(input: CreateOrderInput): Order {
-    // ...實作...
-  }
-}
-```
-
----
-
-## CQRS / 查詢分離
-
-### 原則
-- Command（寫入）與 Query（查詢）責任分離。
-- Command handler 處理業務邏輯與事件，Query handler 專注於資料查詢與組裝。
-- Query handler 可直接存取資料庫或 View Model，無需經過 Domain Layer。
-
-### 範例：Order 查詢 UseCase
-
-```ts
-// src/domains/order/application/use-cases/get-order-detail.ts
-/**
- * 查詢訂單明細 UseCase
- */
-export class GetOrderDetailUseCase {
-  constructor(private readonly orderQueryRepo: OrderQueryRepository) {}
-
-  async execute(orderId: string): Promise<OrderDetailDto> {
-    return this.orderQueryRepo.findDetailById(orderId);
-  }
-}
-```
-
----
 │       │   ├── service/         # Application Service
 │       │   ├── use-cases/       # Use Case
 │       │   └── dto/             # DTO

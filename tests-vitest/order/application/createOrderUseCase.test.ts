@@ -28,9 +28,6 @@ describe('CreateOrderUseCase (integration)', () => {
     // 不再於此建立測試商品，統一使用全域 setup 的預設資料
   });
 
-  afterEach(async () => {
-    // 無需手動 disconnect，Repository 會自動管理
-  });
 
   it('應正確執行建立訂單用例', async () => {
     // Arrange
@@ -38,7 +35,8 @@ describe('CreateOrderUseCase (integration)', () => {
       userId: 'user-1',
       items: [
         { id: 'item-1', productId: '1', name: '測試商品A-1', quantity: 2, price: 100 }
-      ]
+      ],
+      description: 'createOrderUseCase.test.ts-應正確執行建立訂單用例'
     };
 
     // Act
@@ -53,6 +51,7 @@ describe('CreateOrderUseCase (integration)', () => {
       items: [
         { id: 'item-1', productId: '1', name: '測試商品A-1', quantity: 2, price: 100 }
       ],
+      description: 'createOrderUseCase.test.ts-應正確執行建立訂單用例',
       status: orderDetail!.status,
       totalAmount: 200,
     });
@@ -65,7 +64,8 @@ describe('CreateOrderUseCase (integration)', () => {
       userId: '',
       items: [
         { id: 'item-1', productId: '1', name: '測試商品A-1', quantity: 2, price: 100 }
-      ]
+      ],
+      description: 'createOrderUseCase.test.ts-userId為空時應丟出錯誤'
     };
     await expect(useCase.execute(request)).rejects.toThrow('User ID is required');
   });
@@ -73,7 +73,8 @@ describe('CreateOrderUseCase (integration)', () => {
   it('items 為空時應丟出錯誤', async () => {
     const request: CreateOrderRequest = {
       userId: 'user-1',
-      items: []
+      items: [],
+      description: 'createOrderUseCase.test.ts-items為空時應丟出錯誤'
     };
     await expect(useCase.execute(request)).rejects.toThrow('Order must have at least one item');
   });

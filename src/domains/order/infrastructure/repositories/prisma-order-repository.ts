@@ -30,6 +30,7 @@ export class PrismaOrderRepository implements OrderRepository {
       data: {
         id: order.id.value,
         userId: order.userId.value,
+        description: order.description,
         status: order.status.value,
         totalAmount: order.totalAmount,
         createdAt: order.createdAt,
@@ -108,6 +109,7 @@ export class PrismaOrderRepository implements OrderRepository {
       prisma.order.update({
         where: { id: order.id.value },
         data: {
+          description: order.description,
           status: order.status.value,
           totalAmount: order.totalAmount,
           updatedAt: new Date(),
@@ -125,7 +127,7 @@ export class PrismaOrderRepository implements OrderRepository {
 
   // 將 Prisma 資料轉換為 Domain Entity
   private toDomain(order: any): OrderDomain {
-    const { id, userId, status, items, createdAt, updatedAt } = order;
+    const { id, userId, description, status, items, createdAt, updatedAt } = order;
     const orderDomain = new OrderDomain(
       new OrderId(id),
       { value: userId } as any, // UserId
@@ -136,6 +138,7 @@ export class PrismaOrderRepository implements OrderRepository {
         item.quantity,
         item.price
       )),
+      description,
       { value: status } as any,
       createdAt,
       updatedAt

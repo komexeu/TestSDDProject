@@ -13,6 +13,8 @@ model Order {
   id          String       @id @default(uuid())
   /// 下單用戶 ID
   userId      String
+  /// 訂單描述
+  description String @default("")
   /// 訂單狀態（如：已點餐、可取餐、已取餐完成、已取消）
   status      String
   /// 訂單總金額（所有明細加總）

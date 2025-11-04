@@ -10,6 +10,7 @@ export interface CreateOrderRequest {
     quantity: number;
     price: number;
   }>;
+  description?: string; // 預設空字串
 }
 
 /**
@@ -25,6 +26,7 @@ export interface CreateOrderResponse {
     quantity: number;
     price: number;
   }>;
+  description: string;
   status: string;
   totalAmount: number;
   createdAt: Date;

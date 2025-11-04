@@ -20,7 +20,7 @@ export class OrderAppService {
    * @param items 訂單項目陣列
    * @returns 聚合根 Order
    */
-  async createOrder(userId: string, items: { id: string; productId: string; name: string; quantity: number; price: number }[]) {
+  async createOrder(userId: string, items: { id: string; productId: string; name: string; quantity: number; price: number }[], description: string = '') {
     // 驗證 userId
     if (!userId || userId.trim().length === 0) {
       throw new Error('User ID is required');
@@ -36,7 +36,7 @@ export class OrderAppService {
     // 建立 UserId 物件
     const userIdObj = new UserId(userId);
     // 建立 Order 聚合根
-    const order = Order.create(userIdObj, orderItems);
+  const order = Order.create(userIdObj, orderItems, description);
     // 儲存到資料庫
     await this.orderRepository.create(order);
     return order;
