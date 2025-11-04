@@ -1,10 +1,10 @@
-import { AggregateRoot } from '@/shared/domain/entities/base';
-import { Id } from '@/shared/domain/value-objects/common';
-import { OrderStatus } from '@/domains/order/domain/value-objects/order-status';
-import { OrderStateMachineService } from '@/domains/order/domain/services/order-state-mechine-service';
-import { OrderItem } from '@/domains/order/domain/value-objects/order-item';
-import { BusinessRuleError } from '@/shared/application/exceptions';
-import { DomainEvent } from '@/shared/domain/events/domain-event';
+import { AggregateRoot } from '@shared/domain/entities/base';
+import { Id } from '@shared/domain/value-objects/common';
+import { OrderStatus } from '@domains/order/domain/value-objects/order-status';
+import { OrderStateMachineService } from '@domains/order/domain/services/order-state-mechine-service';
+import { OrderItem } from '@domains/order/domain/value-objects/order-item';
+import { BusinessRuleError } from '@shared/application/exceptions';
+import { DomainEvent } from '@shared/domain/events/domain-event';
 
 // 訂單 ID 值物件
 export class OrderId extends Id {

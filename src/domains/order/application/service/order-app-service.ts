@@ -4,10 +4,10 @@
 // 3. 發佈領域事件
 
 
-import { DomainEventPublisher } from '@/shared/domain/events/domain-event';
-import { Order, UserId } from '@/domains/order/domain/entities/order';
-import { OrderItem } from '@/domains/order/domain/value-objects/order-item';
-import { PrismaOrderRepository } from '@/domains/order/infrastructure/repositories/prisma-order-repository';
+import { DomainEventPublisher } from '@shared/domain/events/domain-event';
+import { Order, UserId } from '@domains/order/domain/entities/order';
+import { OrderItem } from '@domains/order/domain/value-objects/order-item';
+import { PrismaOrderRepository } from '@domains/order/infrastructure/repositories/prisma-order-repository';
 
 
 /**

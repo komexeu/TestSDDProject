@@ -1,4 +1,4 @@
-import { ValueObject } from '@/shared/domain/value-objects/common';
+import { ValueObject } from '@shared/domain/value-objects/common';
 
 // 訂單項目值物件
 

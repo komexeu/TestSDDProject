@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
-import { IProductRepository, IProductQueryRepository } from '@/domains/product/domain/repositories/product-repository';
-import { Product, ProductId } from '@/domains/product/domain/entities/product';
-import { ProductName } from '@/domains/product/domain/value-objects/product-properties';
+import { IProductRepository, IProductQueryRepository } from '@domains/product/domain/repositories/product-repository';
+import { Product, ProductId } from '@domains/product/domain/entities/product';
+import { ProductName } from '@domains/product/domain/value-objects/product-properties';
 
 const prisma = new PrismaClient();
 

@@ -1,6 +1,6 @@
 import { MiddlewareHandler } from 'hono';
-import { LoggerFactory } from '@/shared/infrastructure/logger';
-import { ApplicationError } from '@/shared/application/exceptions';
+import { LoggerFactory } from '@shared/infrastructure/logger';
+import { ApplicationError } from '@shared/application/exceptions';
 
 const logger = LoggerFactory.getLogger();
 

@@ -1,5 +1,5 @@
-import { OrderAppService } from '@/domains/order/application/service/order-app-service';
-import { DomainEventPublisher } from '@/shared/domain/events/domain-event';
+import { OrderAppService } from '@domains/order/application/service/order-app-service';
+import { DomainEventPublisher } from '@shared/domain/events/domain-event';
 import { CreateOrderRequest, CreateOrderResponse } from './create-order.dto';
 
 /**

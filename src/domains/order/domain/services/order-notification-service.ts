@@ -1,4 +1,4 @@
-import { Order } from '@/domains/order/domain/entities/order';
+import { Order } from '@domains/order/domain/entities/order';
 
 // 簡易通知服務，實際可整合 email/push/queue
 export function sendOrderNotification(order: Order, notify: (payload: any) => void) {

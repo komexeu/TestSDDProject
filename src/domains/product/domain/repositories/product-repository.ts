@@ -1,5 +1,5 @@
-import { Product, ProductId } from '@/domains/product/domain/entities/product';
-import { ProductName } from '@/domains/product/domain/value-objects/product-properties';
+import { Product, ProductId } from '@domains/product/domain/entities/product';
+import { ProductName } from '@domains/product/domain/value-objects/product-properties';
 
 // 產品倉儲介面
 export interface IProductRepository {

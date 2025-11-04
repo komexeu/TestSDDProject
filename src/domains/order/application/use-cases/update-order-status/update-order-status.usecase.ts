@@ -1,10 +1,10 @@
-import { UseCase } from '@/shared/application/interfaces/use-case';
+import { UseCase } from '@shared/application/interfaces/use-case';
 import { TransitionOrderStatusRequest, TransitionOrderStatusResponse } from './transition-order-status.dto';
-import { OrderRepository } from '@/domains/order/domain/repositories/order-repository';
-import { OrderStatus } from '@/domains/order/domain/value-objects/order-status';
-import { OrderStateMachineService } from '@/domains/order/domain/services/order-state-mechine-service';
-import { DomainEventPublisher } from '@/shared/domain/events/domain-event';
-import { NotFoundError, ValidationError } from '@/shared/application/exceptions';
+import { OrderRepository } from '@domains/order/domain/repositories/order-repository';
+import { OrderStatus } from '@domains/order/domain/value-objects/order-status';
+import { OrderStateMachineService } from '@domains/order/domain/services/order-state-mechine-service';
+import { DomainEventPublisher } from '@shared/domain/events/domain-event';
+import { NotFoundError, ValidationError } from '@shared/application/exceptions';
 
 export class UpdateOrderStatusUseCase implements UseCase<TransitionOrderStatusRequest, TransitionOrderStatusResponse> {
 	constructor(

@@ -1,4 +1,4 @@
-import { Order as OrderDomain } from '@/domains/order/domain/entities/order';
+import { Order as OrderDomain } from '@domains/order/domain/entities/order';
 import { OrderItem } from '../value-objects/order-item';
 
 // 訂單倉儲介面

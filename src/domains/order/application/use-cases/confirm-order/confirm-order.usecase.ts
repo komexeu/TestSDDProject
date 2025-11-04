@@ -1,5 +1,5 @@
-import { OrderAppService } from '@/domains/order/application/service/order-app-service';
-import { DomainEventPublisher } from '@/shared/domain/events/domain-event';
+import { OrderAppService } from '@domains/order/application/service/order-app-service';
+import { DomainEventPublisher } from '@shared/domain/events/domain-event';
 
 /**
  * 用例：確認訂單

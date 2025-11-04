@@ -1,6 +1,6 @@
 import { Entity, AggregateRoot } from '@shared/domain/entities/base';
 import { Id } from '@shared/domain/value-objects/common';
-import { StockQuantity, InventoryOperationType, Operator, OperationReason } from '@inventory/domain/value-objects/inventory-properties';
+import { StockQuantity, InventoryOperationType, Operator, OperationReason } from '@domains/inventory/domain/value-objects/inventory-properties';
 import { BusinessRuleError } from '@shared/application/exceptions';
 import { DomainEvent } from '@shared/domain/events/domain-event';
 

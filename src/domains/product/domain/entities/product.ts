@@ -1,10 +1,10 @@
 // Prisma 型別（僅用於轉換）
 import type { Product as PrismaProduct } from '@prisma/client';
-import { AggregateRoot } from '@/shared/domain/entities/base';
-import { Id } from '@/shared/domain/value-objects/common';
-import { ProductName, ProductDescription, ProductPrice, ProductCode } from '@/domains/product/domain/value-objects/product-properties';
-import { BusinessRuleError } from '@/shared/application/exceptions';
-import { DomainEvent } from '@/shared/domain/events/domain-event';
+import { AggregateRoot } from '@shared/domain/entities/base';
+import { Id } from '@shared/domain/value-objects/common';
+import { ProductName, ProductDescription, ProductPrice, ProductCode } from '@domains/product/domain/value-objects/product-properties';
+import { BusinessRuleError } from '@shared/application/exceptions';
+import { DomainEvent } from '@shared/domain/events/domain-event';
 
 // 產品 ID 值物件
 export class ProductId extends Id {

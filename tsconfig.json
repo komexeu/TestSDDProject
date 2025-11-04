@@ -10,12 +10,12 @@
     "outDir": "dist",
     "baseUrl": "./src",
     "paths": {
-      "@/core/*": ["core/*"],
-      "@/domains/*": ["domains/*"],
-      "@/interfaces/*": ["interfaces/*"],
-      "@/shared/*": ["shared/*"],
-      "@/models/*": ["interfaces/models/*"],
-      "@/tests/*": ["../tests-vitest/*"]
+      "@core/*": ["core/*"],
+      "@domains/*": ["domains/*"],
+      "@interfaces/*": ["interfaces/*"],
+      "@shared/*": ["shared/*"],
+      "@models/*": ["interfaces/models/*"],
+      "@tests/*": ["../tests-vitest/*"]
     }
   },
   "include": ["src/**/*"],

@@ -1,4 +1,4 @@
-import { ValueObject } from '@/shared/domain/value-objects/common';
+import { ValueObject } from '@shared/domain/value-objects/common';
 
 // 訂單狀態值物件
 export class OrderStatus extends ValueObject<string> {

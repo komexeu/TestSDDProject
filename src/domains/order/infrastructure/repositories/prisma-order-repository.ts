@@ -1,8 +1,8 @@
 
 import { PrismaClient } from '@prisma/client';
-import { OrderRepository } from '@/domains/order/domain/repositories/order-repository';
-import { Order as OrderDomain, OrderId, UserId } from '@/domains/order/domain/entities/order';
-import { OrderItem } from '@/domains/order/domain/value-objects/order-item';
+import { OrderRepository } from '@domains/order/domain/repositories/order-repository';
+import { Order as OrderDomain, OrderId, UserId } from '@domains/order/domain/entities/order';
+import { OrderItem } from '@domains/order/domain/value-objects/order-item';
 
 const prisma = new PrismaClient();
 
