@@ -1,11 +1,11 @@
 import { Hono } from 'hono';
-import { errorHandler, requestLogger } from './interfaces/http/middleware/common';
-import { createProductRoutes } from './interfaces/http/routes/product-routes';
-import { createInventoryRoutes } from './interfaces/http/routes/inventory-routes';
+import { errorHandler, requestLogger } from '@/interfaces/http/middleware/common';
+import { createProductRoutes } from '@/interfaces/http/routes/product-routes';
+import { createInventoryRoutes } from '@/interfaces/http/routes/inventory-routes';
 
 // 控制器
-import { ProductController } from './interfaces/http/controllers/product-controller';
-import { InventoryController } from './interfaces/http/controllers/inventory-controller';
+import { ProductController } from '@/interfaces/http/controllers/product-controller';
+import { InventoryController } from '@/interfaces/http/controllers/inventory-controller';
 
 // 依賴注入設定
 function setupDependencies() {

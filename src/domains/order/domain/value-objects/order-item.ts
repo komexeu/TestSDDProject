@@ -1,4 +1,4 @@
-import { ValueObject } from '../../../../shared/domain/value-objects/common';
+import { ValueObject } from '@/shared/domain/value-objects/common';
 
 // 訂單項目值物件
 
@@ -62,5 +62,11 @@ export class OrderItem extends ValueObject<{
 
   public withQuantity(newQuantity: number): OrderItem {
     return new OrderItem(this.id, this.productId, this.name, newQuantity, this.price);
+  }
+  /**
+   * 顯式宣告 equals 以利型別推斷與 IDE 提示
+   */
+  public equals(other: OrderItem): boolean {
+    return super.equals(other);
   }
 }

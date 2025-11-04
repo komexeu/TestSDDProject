@@ -1,0 +1,52 @@
+/**
+ * 查詢訂單明細 Query
+ * Application Query 層，僅查詢，不發佈事件
+ */
+import { PrismaOrderRepository } from '@/domains/order/infrastructure/repositories/prisma-order-repository';
+
+export interface GetOrderDetailQuery {
+  orderId: string;
+}
+
+export interface GetOrderDetailResult {
+  orderId: string;
+  userId: string;
+  items: Array<{
+    id: string;
+    productId: string;
+    name: string;
+    quantity: number;
+    price: number;
+  }>;
+  status: string;
+  totalAmount: number;
+  createdAt: Date;
+}
+
+export class GetOrderDetailQueryHandler {
+  constructor(private readonly orderRepository: PrismaOrderRepository) {}
+
+  /**
+   * 查詢訂單明細
+   * @param query 查詢參數
+   * @returns 訂單明細結果
+   */
+  async execute(query: GetOrderDetailQuery): Promise<GetOrderDetailResult | null> {
+    const order = await this.orderRepository.findById(query.orderId);
+    if (!order) return null;
+    return {
+      orderId: order.id.value,
+      userId: order.userId.value,
+      items: order.items.map(item => ({
+        id: item.id,
+        productId: item.productId,
+        name: item.name,
+        quantity: item.quantity,
+        price: item.price,
+      })),
+      status: order.status.value,
+      totalAmount: order.totalAmount,
+      createdAt: order.createdAt,
+    };
+  }
+}

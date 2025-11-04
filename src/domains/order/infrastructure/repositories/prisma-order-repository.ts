@@ -1,7 +1,8 @@
+
 import { PrismaClient } from '@prisma/client';
-import { OrderRepository } from '../../domain/repositories/order-repository';
-import { Order as OrderDomain, OrderId, UserId } from '../../domain/entities/order';
-import { OrderItem } from '../../domain/value-objects/order-item';
+import { OrderRepository } from '@/domains/order/domain/repositories/order-repository';
+import { Order as OrderDomain, OrderId, UserId } from '@/domains/order/domain/entities/order';
+import { OrderItem } from '@/domains/order/domain/value-objects/order-item';
 
 const prisma = new PrismaClient();
 
@@ -125,10 +126,10 @@ export class PrismaOrderRepository implements OrderRepository {
   // 將 Prisma 資料轉換為 Domain Entity
   private toDomain(order: any): OrderDomain {
     const { id, userId, status, items, createdAt, updatedAt } = order;
-    return new OrderDomain(
+    const orderDomain = new OrderDomain(
       new OrderId(id),
       { value: userId } as any, // UserId
-      items.map((item: any) => new (require('../../domain/value-objects/order-item').OrderItem)(
+      items.map((item: any) => new OrderItem(
         item.id,
         item.productId,
         item.name,
@@ -139,5 +140,8 @@ export class PrismaOrderRepository implements OrderRepository {
       createdAt,
       updatedAt
     );
+    // 補上 isDelete 欄位
+    (orderDomain as any).isDelete = order.isDelete;
+    return orderDomain;
   }
 }

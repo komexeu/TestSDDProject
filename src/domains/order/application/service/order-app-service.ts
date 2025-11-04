@@ -3,20 +3,11 @@
 // 2. 儲存聚合根到 DB
 // 3. 發佈領域事件
 
-import { PrismaOrderRepository } from '../../infrastructure/repositories/prisma-order-repository';
 
-// 假設有一個 EventBus 介面
-
-/**
- * EventBus 介面，負責發佈領域事件
- */
-interface EventBus {
-  /**
-   * 發佈事件
-   * @param event 任意事件物件
-   */
-  publish(event: any): Promise<void>;
-}
+import { DomainEventPublisher } from '@/shared/domain/events/domain-event';
+import { Order, UserId } from '@/domains/order/domain/entities/order';
+import { OrderItem } from '@/domains/order/domain/value-objects/order-item';
+import { PrismaOrderRepository } from '@/domains/order/infrastructure/repositories/prisma-order-repository';
 
 
 /**
@@ -24,12 +15,39 @@ interface EventBus {
  */
 export class OrderAppService {
   /**
+   * 建立訂單
+   * @param userId 用戶ID
+   * @param items 訂單項目陣列
+   * @returns 聚合根 Order
+   */
+  async createOrder(userId: string, items: { id: string; productId: string; name: string; quantity: number; price: number }[]) {
+    // 驗證 userId
+    if (!userId || userId.trim().length === 0) {
+      throw new Error('User ID is required');
+    }
+    // 驗證 items
+    if (!items || items.length === 0) {
+      throw new Error('Order must have at least one item');
+    }
+    // 轉換 items 為 OrderItem 物件
+    const orderItems: OrderItem[] = items.map(
+      (item) => new OrderItem(item.id, item.productId, item.name, item.quantity, item.price)
+    );
+    // 建立 UserId 物件
+    const userIdObj = new UserId(userId);
+    // 建立 Order 聚合根
+    const order = Order.create(userIdObj, orderItems);
+    // 儲存到資料庫
+    await this.orderRepository.create(order);
+    return order;
+  }
+  /**
    * @param orderRepository 訂單倉儲
    * @param eventBus 事件發佈器（目前僅用於型別說明）
    */
   constructor(
     private readonly orderRepository: PrismaOrderRepository,
-    private readonly eventBus: EventBus
+    private readonly eventPublisher: DomainEventPublisher
   ) {}
 
   // 取消訂單
@@ -125,22 +143,4 @@ export class OrderAppService {
   }
 }
 
-// EventBus 實作範例（可用於測試或真實事件系統）
 
-/**
- * 範例事件發佈器，可串接通知、log、外部 API 等
- */
-export class SimpleEventBus implements EventBus {
-  /**
-   * 發佈事件
-   * @param event 任意事件物件
-   */
-  async publish(event: any): Promise<void> {
-    console.log('Event published:', event);
-    // 可在這裡串接通知、log、外部 API 等
-  }
-}
-
-// 使用範例
-// const appService = new OrderAppService(new PrismaOrderRepository(), new SimpleEventBus());
-// await appService.cancelOrder('order-id-123', 'user');

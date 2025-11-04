@@ -1,8 +1,8 @@
-import { UseCase } from '../../../../shared/application/interfaces/use-case';
+import { UseCase } from '@/shared/application/interfaces/use-case';
 import { GetProductRequest, GetProductResponse } from '../dto/product-dto';
-import { IProductRepository } from '../../domain/repositories/product-repository';
-import { ProductId } from '../../domain/entities/product';
-import { NotFoundError } from '../../../../shared/application/exceptions';
+import { IProductRepository } from '@/domains/product/domain/repositories/product-repository';
+import { ProductId } from '@/domains/product/domain/entities/product';
+import { NotFoundError } from '@/shared/application/exceptions';
 
 export class GetProductUseCase implements UseCase<GetProductRequest, GetProductResponse> {
   constructor(private readonly productRepository: IProductRepository) {}

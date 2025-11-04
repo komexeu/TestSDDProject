@@ -1,17 +1,30 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { OrderService } from '../../src/domains/order/application/OrderService';
+import { OrderAppService } from '../../src/domains/order/application/service/order-app-service';
+import { PrismaOrderRepository } from '../../src/domains/order/infrastructure/repositories/prisma-order-repository';
+import { InMemoryDomainEventPublisher } from '../../src/shared/domain/events/domain-event';
 import { PrismaClient } from '@prisma/client';
 
+
 const prisma = new PrismaClient();
-const service = new OrderService();
+const orderRepository = new PrismaOrderRepository();
+const eventPublisher = new InMemoryDomainEventPublisher();
+const service = new OrderAppService(orderRepository, eventPublisher);
 
 const testUserId = 'test-user-1';
 const testProductId = 'test-product-1';
 
+
 beforeAll(async () => {
-  // 建立測試商品
-  await prisma.product.create({
-    data: {
+  // 先刪除 InventoryLog、OrderItem、Order、Product，避免唯一鍵衝突與外鍵問題
+  await prisma.inventoryLog?.deleteMany?.({ where: { productId: testProductId } }).catch(() => {});
+  await prisma.orderItem.deleteMany({});
+  await prisma.order.deleteMany({});
+  await prisma.product.deleteMany({ where: { id: testProductId } });
+  // upsert 測試商品，避免外鍵錯誤
+  await prisma.product.upsert({
+    where: { id: testProductId },
+    update: {},
+    create: {
       id: testProductId,
       name: '測試商品',
       description: '單元測試用',
@@ -21,71 +34,45 @@ beforeAll(async () => {
   });
 });
 
+
 afterAll(async () => {
+  await prisma.inventoryLog?.deleteMany?.({ where: { productId: testProductId } }).catch(() => {});
   await prisma.orderItem.deleteMany({});
   await prisma.order.deleteMany({});
-  await prisma.product.deleteMany({});
+  await prisma.product.deleteMany({ where: { id: testProductId } });
   await prisma.$disconnect();
 });
 
 describe('OrderService', () => {
   it('createOrder & getOrder', async () => {
-    const order = await service.createOrder({
-      userId: testUserId,
-      status: '已點餐',
-      totalAmount: 200,
-      items: [
-        {
-          productId: testProductId,
-          name: '測試商品',
-          quantity: 2,
-          price: 100,
-          totalPrice: 200,
-        },
-      ],
-    });
+    const items = [
+      { id: 'oi1', productId: testProductId, name: '測試商品', quantity: 2, price: 100 }
+    ];
+    const order = await service.createOrder(testUserId, items);
     expect(order).toBeDefined();
     expect(order.items.length).toBe(1);
-    const found = await service.getOrder(order.id);
+    const found = await orderRepository.findById(order.id.value);
     expect(found).not.toBeNull();
     expect(found?.items[0].productId).toBe(testProductId);
   });
 
   it('updateOrder', async () => {
-    const order = await service.createOrder({
-      userId: testUserId,
-      status: '已點餐',
-      totalAmount: 100,
-      items: [
-        {
-          productId: testProductId,
-          name: '測試商品',
-          quantity: 1,
-          price: 100,
-          totalPrice: 100,
-        },
-      ],
-    });
-    const updated = await service.updateOrder(order.id, { status: '已取餐完成' });
-    expect(updated?.status).toBe('已取餐完成');
+    const items = [
+      { id: 'oi2', productId: testProductId, name: '測試商品', quantity: 1, price: 100 }
+    ];
+    const order = await service.createOrder(testUserId, items);
+    // 假設有 confirmOrder 方法
+    const updated = await service.confirmOrder(order.id.value);
+  expect(updated.status.value).toBe('已確認訂單');
   });
 
   it('deleteOrder', async () => {
-    const order = await service.createOrder({
-      userId: testUserId,
-      status: '已點餐',
-      totalAmount: 100,
-      items: [
-        {
-          productId: testProductId,
-          name: '測試商品',
-          quantity: 1,
-          price: 100,
-          totalPrice: 100,
-        },
-      ],
-    });
-    const deleted = await service.deleteOrder(order.id);
-    expect(deleted?.isDelete).toBe(true);
+    const items = [
+      { id: 'oi3', productId: testProductId, name: '測試商品', quantity: 1, price: 100 }
+    ];
+    const order = await service.createOrder(testUserId, items);
+    await orderRepository.delete(order.id.value);
+    const deleted = await orderRepository.findById(order.id.value);
+  expect(deleted?.isDelete).toBe(true);
   });
 });

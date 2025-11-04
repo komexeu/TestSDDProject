@@ -1,8 +1,8 @@
-import { Entity, AggregateRoot } from '../../../../shared/domain/entities/base';
-import { Id } from '../../../../shared/domain/value-objects/common';
-import { StockQuantity, InventoryOperationType, Operator, OperationReason } from '../value-objects/inventory-properties';
-import { BusinessRuleError } from '../../../../shared/application/exceptions';
-import { DomainEvent } from '../../../../shared/domain/events/domain-event';
+import { Entity, AggregateRoot } from '@shared/domain/entities/base';
+import { Id } from '@shared/domain/value-objects/common';
+import { StockQuantity, InventoryOperationType, Operator, OperationReason } from '@inventory/domain/value-objects/inventory-properties';
+import { BusinessRuleError } from '@shared/application/exceptions';
+import { DomainEvent } from '@shared/domain/events/domain-event';
 
 // 庫存 ID 值物件
 export class InventoryId extends Id {

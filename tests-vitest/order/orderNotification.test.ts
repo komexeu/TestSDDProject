@@ -1,9 +1,7 @@
 
 import { describe, it, expect, vi } from 'vitest';
-import { sendOrderNotification } from '../../src/domains/order/domain/services/orderNotificationService';
-import { OrderId } from '../../src/domains/order/domain/entities/order'; // Added OrderId import
-import { Order } from '../../src/domains/order/domain/entities/order';
-import { UserId } from '../../src/domains/order/domain/entities/order';
+import { sendOrderNotification } from '../../src/domains/order/domain/services/order-notification-service';
+import { OrderId, Order, UserId } from '../../src/domains/order/domain/entities/order';
 import { OrderStatus } from '../../src/domains/order/domain/value-objects/order-status';
 import { OrderItem } from '../../src/domains/order/domain/value-objects/order-item';
 
@@ -12,7 +10,7 @@ describe('訂單通知服務', () => {
     const order = new Order(
       new OrderId('O001'),
       new UserId('U001'),
-      [new OrderItem('P001', '珍奶', 1, 60)],
+      [new OrderItem('oi1', 'P001', '珍奶', 1, 60)],
       new OrderStatus('已點餐'),
       new Date(),
       new Date()
@@ -26,7 +24,7 @@ describe('訂單通知服務', () => {
     const order = new Order(
       new OrderId('O002'),
       new UserId('U002'),
-      [new OrderItem('P002', '紅茶', 1, 40)],
+      [new OrderItem('oi2', 'P002', '紅茶', 1, 40)],
       new OrderStatus('可取餐'),
       new Date(),
       new Date()

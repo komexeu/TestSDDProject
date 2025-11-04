@@ -1,6 +1,6 @@
-import { UseCase } from '../../../../shared/application/interfaces/use-case';
+import { UseCase } from '@/shared/application/interfaces/use-case';
 import { ListProductsRequest, ListProductsResponse } from '../dto/product-dto';
-import { IProductQueryRepository } from '../../domain/repositories/product-repository';
+import { IProductQueryRepository } from '@/domains/product/domain/repositories/product-repository';
 
 export class ListProductsUseCase implements UseCase<ListProductsRequest, ListProductsResponse> {
   constructor(private readonly productQueryRepository: IProductQueryRepository) {}
