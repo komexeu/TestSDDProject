@@ -97,6 +97,11 @@ src/
 controllers → use-cases → service → domain/repositories (interface) ← infrastructure/repositories
 use-cases 也可依賴 shared/domain/events
 
+測試對應：
+domain (entities/value-objects/services) → Unit Tests
+application (use-cases/service) → Unit + Integration (含事件發佈)
+infrastructure (repositories) → Integration（對應 Prisma schema / Docker PostgreSQL）
+
 ---
 
 ## 5. 補充 DDD 實踐重點
