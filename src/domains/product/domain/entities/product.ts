@@ -1,10 +1,10 @@
 // Prisma 型別（僅用於轉換）
 import type { Product as PrismaProduct } from '@prisma/client';
-import { AggregateRoot } from '../../../../shared/domain/entities/base';
-import { Id } from '../../../../shared/domain/value-objects/common';
-import { ProductName, ProductDescription, ProductPrice, ProductCode } from '../value-objects/product-properties';
-import { BusinessRuleError } from '../../../../shared/application/exceptions';
-import { DomainEvent } from '../../../../shared/domain/events/domain-event';
+import { AggregateRoot } from '@shared/domain/entities/base';
+import { Id } from '@shared/domain/value-objects/common';
+import { ProductName, ProductDescription, ProductPrice, ProductCode } from '@domains/product/domain/value-objects/product-properties';
+import { BusinessRuleError } from '@shared/application/exceptions';
+import { DomainEvent } from '@shared/domain/events/domain-event';
 
 // 產品 ID 值物件
 export class ProductId extends Id {
@@ -49,7 +49,7 @@ export class ProductDeletedEvent implements DomainEvent {
 
 // 產品聚合根
 export class Product extends AggregateRoot<ProductId> {
-  private _code?: ProductCode;
+  private _code: ProductCode;
   private _stock: number = 0;
   private _name: ProductName;
   private _description: ProductDescription;
@@ -63,14 +63,16 @@ export class Product extends AggregateRoot<ProductId> {
     name: ProductName,
     description: ProductDescription,
     price: ProductPrice,
-    code?: ProductCode,
+    code: ProductCode,
     createdAt?: Date,
     updatedAt?: Date,
     isActive?: boolean,
     stock?: number
   ) {
     super(id);
-    
+    if (!code) {
+      throw new BusinessRuleError('Product code is required');
+    }
     this._name = name;
     this._description = description;
     this._price = price;
@@ -91,14 +93,14 @@ export class Product extends AggregateRoot<ProductId> {
     name: ProductName,
     description: ProductDescription,
     price: ProductPrice,
-    code?: ProductCode
+    code: ProductCode
   ): Product {
     const productId = new ProductId(Id.generate().value);
     return new Product(productId, name, description, price, code);
   }
 
   // Getters
-  get code(): ProductCode | undefined {
+  get code(): ProductCode {
     return this._code;
   }
   get stock(): number {
@@ -106,12 +108,15 @@ export class Product extends AggregateRoot<ProductId> {
   }
   // Prisma 轉換靜態方法
   public static fromPrisma(prismaProduct: PrismaProduct): Product {
+    if (!prismaProduct.code) {
+      throw new BusinessRuleError('Product code is required in database');
+    }
     return new Product(
       new ProductId(prismaProduct.id),
       new ProductName(prismaProduct.name),
       new ProductDescription(prismaProduct.description),
       new ProductPrice(prismaProduct.price),
-      prismaProduct.code ? new ProductCode(prismaProduct.code) : undefined,
+      new ProductCode(prismaProduct.code),
       prismaProduct.createdAt,
       prismaProduct.updatedAt,
       prismaProduct.isActive,
@@ -125,8 +130,8 @@ export class Product extends AggregateRoot<ProductId> {
       id: this.id.value,
       name: this._name.value,
       description: this._description.value,
-      price: this._price.value,
-      code: this._code ? this._code.value : undefined,
+      price: this._price.amount, // 只存整數金額
+      code: this._code.value,
       createdAt: this._createdAt,
       updatedAt: this._updatedAt,
       isActive: this._isActive,
@@ -174,9 +179,11 @@ export class Product extends AggregateRoot<ProductId> {
 
   // 業務方法：設定產品代碼
   public setCode(code: ProductCode): void {
+    if (!code) {
+      throw new BusinessRuleError('Product code is required');
+    }
     this._code = code;
     this._updatedAt = new Date();
-
     this.addDomainEvent(new ProductUpdatedEvent(this.id.value));
   }
 

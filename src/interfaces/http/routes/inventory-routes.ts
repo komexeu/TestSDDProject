@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
-import { InventoryController } from '../controllers/inventory-controller';
-import { adminAuth } from '../middleware/common';
+import { InventoryController } from '@interfaces/http/controllers/inventory-controller';
+import { adminAuth } from '@interfaces/http/middleware/common';
 
 export function createInventoryRoutes(inventoryController: InventoryController): Hono {
   const app = new Hono();

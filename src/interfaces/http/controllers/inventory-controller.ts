@@ -1,8 +1,8 @@
 import { Context } from 'hono';
-import { GetStockUseCase } from '../../../domains/inventory/application/use-cases/get-stock';
-import { AdjustStockUseCase } from '../../../domains/inventory/application/use-cases/adjust-stock';
-import { SaleStockUseCase } from '../../../domains/inventory/application/use-cases/sale-stock';
-import { GetInventoryLogsUseCase } from '../../../domains/inventory/application/use-cases/get-inventory-logs';
+import { GetStockUseCase } from '@domains/inventory/application/use-cases/get-stock';
+import { AdjustStockUseCase } from '@domains/inventory/application/use-cases/adjust-stock';
+import { SaleStockUseCase } from '@domains/inventory/application/use-cases/sale-stock';
+import { GetInventoryLogsUseCase } from '@domains/inventory/application/use-cases/get-inventory-logs';
 import { PrismaClient } from '@prisma/client';
 
 export class InventoryController {

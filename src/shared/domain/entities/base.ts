@@ -1,6 +1,6 @@
 // 基礎實體抽象類別
-import { Id } from '../value-objects/common';
-import { DomainEvent } from '../events/domain-event';
+import { Id } from '@shared/domain/value-objects/common';
+import { DomainEvent } from '@shared/domain/events/domain-event';
 
 export abstract class Entity<TId extends Id> {
   protected readonly _id: TId;

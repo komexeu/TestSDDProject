@@ -1,4 +1,4 @@
-import { ValueObject } from '../../../../shared/domain/value-objects/common';
+import { ValueObject } from '@shared/domain/value-objects/common';
 
 // 訂單狀態值物件
 export class OrderStatus extends ValueObject<string> {
@@ -19,17 +19,8 @@ export class OrderStatus extends ValueObject<string> {
     ];
     
     if (!validStatuses.includes(value)) {
-      throw new Error(`Invalid order status: ${value}`);
+      throw new Error(`無效的訂單狀態：${value}`);
     }
     super(value);
-  }
-
-
-  public isActive(): boolean {
-    return !['已取餐完成', '已取消', '製作失敗'].includes(this._value);
-  }
-
-  public isCancellable(): boolean {
-    return ['已點餐', '已確認訂單'].includes(this._value);
   }
 }

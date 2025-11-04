@@ -6,6 +6,7 @@
     "test": "rm -f ./test.db && cross-env NODE_ENV=test dotenv -e .env.test npx prisma migrate deploy && cross-env NODE_ENV=test dotenv -e .env.test npx vitest run --dir=tests-vitest",
     "test:watch": "cross-env NODE_ENV=test dotenv -e .env.test npx vitest --dir=tests-vitest",
     "test:ui": "cross-env NODE_ENV=test dotenv -e .env.test npx vitest --ui --dir=tests-vitest",
+    "resetDb": "npx prisma migrate reset --preview-feature",
     "build": "tsc",
     "dev": "tsc && node dist/server.js",
     "start": "node dist/server.js",

@@ -1,5 +1,5 @@
 import { Context } from 'hono';
-import { ValidationError } from '../../../shared/application/exceptions';
+import { ValidationError } from '@shared/application/exceptions';
 
 // 臨時簡化的產品控制器（暫時不依賴用例）
 export class ProductController {

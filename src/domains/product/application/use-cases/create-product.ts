@@ -1,18 +1,18 @@
-import { UseCase } from '../../../../shared/application/interfaces/use-case';
+import { UseCase } from '@shared/application/interfaces/use-case';
 import { CreateProductRequest, CreateProductResponse } from '../dto/product-dto';
-import { IProductRepository } from '../../domain/repositories/product-repository';
-import { Product } from '../../domain/entities/product';
-import { ProductName, ProductDescription, ProductPrice, ProductCode } from '../../domain/value-objects/product-properties';
-import { ProductManagementService } from '../../domain/services/product-management';
-import { DomainEventPublisher } from '../../../../shared/domain/events/domain-event';
-import { ValidationError } from '../../../../shared/application/exceptions';
+import { IProductRepository } from '@domains/product/domain/repositories/product-repository';
+import { Product } from '@domains/product/domain/entities/product';
+import { ProductName, ProductDescription, ProductPrice, ProductCode } from '@domains/product/domain/value-objects/product-properties';
+import { ProductManagementService } from '@domains/product/domain/services/product-management';
+import { DomainEventPublisher } from '@shared/domain/events/domain-event';
+import { ValidationError } from '@shared/application/exceptions';
 
 export class CreateProductUseCase implements UseCase<CreateProductRequest, CreateProductResponse> {
   constructor(
     private readonly productRepository: IProductRepository,
     private readonly productManagementService: ProductManagementService,
     private readonly eventPublisher: DomainEventPublisher
-  ) {}
+  ) { }
 
   async execute(request: CreateProductRequest): Promise<CreateProductResponse> {
     // 建立領域物件
@@ -34,14 +34,18 @@ export class CreateProductUseCase implements UseCase<CreateProductRequest, Creat
     await this.productRepository.save(product);
 
     // 發布領域事件
-    const domainEvents = product.getDomainEvents();
+
+    // 取得並發布領域事件
+    const domainEvents = (product as any).getDomainEvents ? product.getDomainEvents() : [];
     for (const event of domainEvents) {
       await this.eventPublisher.publish(event);
     }
-    product.clearDomainEvents();
+    if ((product as any).clearDomainEvents) {
+      product.clearDomainEvents();
+    }
 
     return {
-      id: product.id.value,
+  id: product.id.value,
       name: product.name.value,
       description: product.description.value,
       price: product.price.amount,

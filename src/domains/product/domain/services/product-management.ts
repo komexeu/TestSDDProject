@@ -1,7 +1,7 @@
-import { Product } from '../entities/product';
-import { ProductName } from '../value-objects/product-properties';
-import { IProductRepository } from '../repositories/product-repository';
-import { BusinessRuleError } from '../../../../shared/application/exceptions';
+import { Product } from '@domains/product/domain/entities/product';
+import { ProductName } from '@domains/product/domain/value-objects/product-properties';
+import { IProductRepository } from '@domains/product/domain/repositories/product-repository';
+import { BusinessRuleError } from '@shared/application/exceptions';
 
 // 產品管理領域服務
 export class ProductManagementService {

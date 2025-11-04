@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
-import { ProductController } from '../controllers/product-controller';
-import { adminAuth } from '../middleware/common';
+import { ProductController } from '@interfaces/http/controllers/product-controller';
+import { adminAuth } from '@interfaces/http/middleware/common';
 
 export function createProductRoutes(productController: ProductController): Hono {
   const app = new Hono();
