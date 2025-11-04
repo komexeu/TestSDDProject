@@ -1,0 +1,121 @@
+openapi: 3.0.3
+info:
+  title: Order API
+  version: 1.0.0
+  description: 訂單建立與查詢 API 介面約定
+paths:
+  /orders:
+    post:
+      summary: 建立訂單
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '201':
+          description: 訂單建立成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateOrderResponse'
+        '400':
+          description: 請求參數錯誤
+  /orders/{orderId}:
+    get:
+      summary: 查詢訂單明細
+      parameters:
+        - in: path
+          name: orderId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 查詢成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderDetail'
+        '404':
+          description: 查無此訂單
+components:
+  schemas:
+    CreateOrderRequest:
+      type: object
+      required:
+        - userId
+        - items
+      properties:
+        userId:
+          type: string
+          description: 用戶ID
+        items:
+          type: array
+          description: 訂單明細
+          items:
+            $ref: '#/components/schemas/OrderItemInput'
+        description:
+          type: string
+          description: 備註
+    OrderItemInput:
+      type: object
+      required:
+        - id
+        - productId
+        - name
+        - quantity
+        - price
+      properties:
+        id:
+          type: string
+          description: 訂單項目ID
+        productId:
+          type: string
+          description: 商品ID
+        name:
+          type: string
+          description: 商品名稱
+        quantity:
+          type: integer
+          description: 數量
+        price:
+          type: integer
+          description: 價格
+    CreateOrderResponse:
+      type: object
+      properties:
+        orderId:
+          type: string
+        userId:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItemOutput'
+        description:
+          type: string
+        status:
+          type: string
+        totalAmount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+    OrderItemOutput:
+      type: object
+      properties:
+        id:
+          type: string
+        productId:
+          type: string
+        name:
+          type: string
+        quantity:
+          type: integer
+        price:
+          type: integer
+    OrderDetail:
+      allOf:
+        - $ref: '#/components/schemas/CreateOrderResponse'

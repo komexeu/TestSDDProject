@@ -8,32 +8,64 @@
 - [ ] DB003 建立 migration 並套用至本地資料庫於 prisma/migrations/
 
 ## API 與服務任務
-- [ ] M001 [P] [US1] 建立 Order Entity 於 src/domains/order/domain/entities/order.ts
-- [ ] M002 [P] [US1] 建立 Order Repository 介面於 src/domains/order/domain/repositories/orderRepository.ts
-- [ ] M003 [P] [US1] 建立 Order Service 於 src/domains/order/domain/services/orderService.ts
-- [ ] M004 [P] [US1] 建立 CreateOrder Use Case 於 src/domains/order/application/use-cases/createOrderUseCase.ts
-- [ ] M005 [P] [US1] 建立 Order Controller 於 src/interfaces/http/controllers/orderController.ts
-- [ ] M006 [P] [US1] 設計建立訂單 API 路由於 src/interfaces/http/routes/orderRoutes.ts
-- [ ] M007 [P] [US2] 設計訂單資料驗證邏輯於 src/models/productValidation.ts
-- [ ] M008 [P] [US3] 設計訂單建立成功通知服務於 src/domains/order/domain/services/orderNotificationService.ts
+- [ ] M005 [P] [US1] 訂單 API 介面約定（OpenAPI）於 specs/004-create-order/contracts/openapi.yaml
+- [ ] M006 [P] [US1] 設計建立訂單 API 路由約定於 specs/004-create-order/contracts/openapi.yaml
 
 ## 測試任務
 
-- [ ] T001 [P] [US1] 建立訂單單元測試於 (tests-vitest/order/orderCore.test.ts)
-	- 驗證訂單建立時狀態、明細、金額正確
-	- 驗證訂單狀態流轉（如：已點餐→已確認→製作中→可取餐→已取餐完成）
-	- 驗證異常流程（如：狀態錯誤時拋出例外）
+- [ ] T001 [P] [US1] 訂單 Entity 單元測試於 (tests-vitest/order/entity/order.entity.test.ts)
+	- 驗證 OrderItem 欄位（id、productId、name、quantity、price）皆不可為空或不合法，否則拋出正確錯誤訊息
+	- 驗證 OrderItem 的 totalPrice 計算正確
+	- 訂單建立時必須有至少一項餐點，否則拋出 BusinessRuleError
+	- 驗證訂單總金額計算正確
+	- 驗證 setConfirm/setStartPreparation/setMarkReadyForPickup/setComplete/setFail/cancel 等狀態流轉正確，且僅允許合法狀態轉換，否則拋出 BusinessRuleError
+	- 驗證 canBeCancelled 與 isInProgress 行為正確
 
 - [ ] T002 [P] [US2] 訂單資料驗證測試於 (tests-vitest/models/productValidation.test.ts)
-	- 驗證商品名稱、數量、價格等欄位驗證規則
+	- 驗證商品名稱、數量、價格等欄位驗證規則（如必填、型別、範圍）
 	- 驗證不合法資料時會正確拋出錯誤
 
-- [ ] T003 [P] [US3] 訂單通知服務測試於 (tests-vitest/order/orderNotification.test.ts)
-	- 驗證訂單建立後會正確發送通知
-	- 驗證通知內容正確（如：訂單編號、狀態、用戶資訊）
+- [ ] T003 [P] [US3] 訂單通知服務測試於 (tests-vitest/order/service/orderNotificationService.test.ts)
+	- 呼叫 sendOrderNotification 時，會正確呼叫 notify 並帶入訂單資訊
+	- 驗證通知 payload 內容包含訂單 id、userId、狀態、items（含明細、數量、價格、totalPrice）
 
-- [ ] T004 [US1] 建立訂單時，資料會正確寫入資料庫，並可查詢驗證（含訂單主檔與明細）
-- [ ] T005 [US1] 建立訂單 API 整合測試，驗證前後端串接流程與資料正確性
+- [ ] T004 [US1] 訂單 UseCase 與資料庫整合測試於 (tests-vitest/order/application/createOrderUseCase.test.ts)
+	- 建立訂單成功時，資料正確寫入資料庫
+	- userId 為空時應丟出 'User ID is required' 錯誤
+	- items 為空時應丟出 'Order must have at least one item' 錯誤
+
+- [ ] T005 [US1] 訂單 UseCase 與資料庫整合測試於 (tests-vitest/order/application/completeOrderUseCase.test.ts)
+	- 狀態流轉至可取餐後，執行完成訂單，狀態應為 '已取餐完成'
+
+- [ ] T006 [US1] 訂單 UseCase 與資料庫整合測試於 (tests-vitest/order/application/confirmOrderUseCase.test.ts)
+	- 執行確認訂單後，狀態應為 '已確認訂單'
+
+- [ ] T007 [US1] 訂單 UseCase 與資料庫整合測試於 (tests-vitest/order/application/failOrderUseCase.test.ts)
+	- 狀態為製作中時可標記失敗，狀態應為 '製作失敗'，並驗證 errorMessage
+
+- [ ] T008 [US1] 訂單 UseCase 與資料庫整合測試於 (tests-vitest/order/application/markReadyForPickupUseCase.test.ts)
+	- 狀態為製作中時可標記可取餐，狀態應為 '可取餐'
+
+- [ ] T009 [US1] 訂單 UseCase 與資料庫整合測試於 (tests-vitest/order/application/startPreparationUseCase.test.ts)
+	- 狀態為已確認訂單時可開始製作，狀態應為 '製作中'
+
+- [ ] T010 [US1] 訂單 UseCase 與資料庫整合測試於 (tests-vitest/order/application/cancelOrderUseCase.test.ts)
+	- 狀態為已點餐/已確認訂單時可取消，狀態應為 '已取消'，cancelledBy 正確
+
+- [ ] T011 [US1] 訂單 UseCase 與資料庫整合測試於 (tests-vitest/order/application/getOrderDetailQuery.test.ts)
+	- 建立後可查詢訂單明細，驗證 orderId、items、totalAmount 等欄位正確
+	- 查詢不存在訂單時回傳 null
+
+- [ ] T012 [US1] 訂單服務層測試於 (tests-vitest/order/service/orderService.test.ts)
+	- AppService 建立訂單時，userId 或 items 不合法會拋出正確錯誤
+	- 建立訂單時 repository.create 會被呼叫，資料正確
+
+- [ ] T013 [US1] 狀態機服務測試於 (tests-vitest/order/service/orderStateMachineService.test.ts)
+	- 驗證所有合法狀態轉換皆可通過
+	- 驗證所有非法狀態轉換皆會拋出 BusinessRuleError
+	- 驗證 getAvailableTransitions 回傳正確下一步
+	- 驗證 canBeCancelled 只允許特定狀態
+	- 驗證 isInProgress 判斷正確
 
 ## 文件與同步任務
 - [ ] D001 補充 API 文件於 specs/004-create-order/contracts/openapi.yaml
