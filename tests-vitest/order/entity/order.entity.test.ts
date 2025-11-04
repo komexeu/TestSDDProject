@@ -26,6 +26,28 @@ function createOrder({
 }
 
 describe('Order Entity', () => {
+  describe('OrderItem 值物件驗證', () => {
+    it('id 不可為空', () => {
+      expect(() => new OrderItem('', 'p-1', '商品A', 1, 10)).toThrow('訂單項目 ID 不可為空');
+    });
+    it('productId 不可為空', () => {
+      expect(() => new OrderItem('i-1', '', '商品A', 1, 10)).toThrow('商品 ID 不可為空');
+    });
+    it('name 不可為空', () => {
+      expect(() => new OrderItem('i-1', 'p-1', '', 1, 10)).toThrow('訂單項目名稱不可為空');
+    });
+    it('quantity 必須大於 0', () => {
+      expect(() => new OrderItem('i-1', 'p-1', '商品A', 0, 10)).toThrow('數量必須大於 0');
+      expect(() => new OrderItem('i-1', 'p-1', '商品A', -1, 10)).toThrow('數量必須大於 0');
+    });
+    it('price 不可為負數', () => {
+      expect(() => new OrderItem('i-1', 'p-1', '商品A', 1, -1)).toThrow('價格不可為負數');
+    });
+    it('totalPrice 正確', () => {
+      const item = new OrderItem('i-1', 'p-1', '商品A', 3, 20);
+      expect(item.totalPrice).toBe(60);
+    });
+  });
   it('建立訂單時必須有至少一項餐點', () => {
     expect(() => createOrder({ items: [] })).toThrow(BusinessRuleError);
   });
