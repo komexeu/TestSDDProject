@@ -19,7 +19,7 @@ export class CreateProductUseCase implements UseCase<CreateProductRequest, Creat
     const name = new ProductName(request.name);
     const description = new ProductDescription(request.description);
     const price = new ProductPrice(request.price);
-    const code = request.code ? new ProductCode(request.code) : undefined;
+    const code = request.code ? new ProductCode(request.code) : new ProductCode('');
 
     // 驗證商品名稱唯一性
     await this.productManagementService.validateUniqueProductName(name);
