@@ -1,18 +1,14 @@
 
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { CreateOrderUseCase } from '@domains/order/application/use-cases/create-order/create-order.usecase';
 import { CreateOrderRequest } from '@domains/order/application/use-cases/create-order/create-order.dto';
 import { OrderAppService } from '@domains/order/application/service/order-app-service';
 import { PrismaOrderRepository } from '@domains/order/infrastructure/repositories/prisma-order-repository';
-import { ProductRepository } from '@domains/product/infrastructure/repositories/product-repository.prisma';
 import { InMemoryDomainEventPublisher } from '@shared/domain/events/domain-event';
 import { GetOrderDetailQueryHandler } from '@domains/order/application/queries/get-order-detail.query';
-import { Product, ProductId } from '@domains/product/domain/entities/product';
-import { ProductName, ProductDescription, ProductPrice, ProductCode } from '@domains/product/domain/value-objects/product-properties';
 
 describe('CreateOrderUseCase (integration)', () => {
   let orderRepository: PrismaOrderRepository;
-  let productRepository: ProductRepository;
   let eventPublisher: InMemoryDomainEventPublisher;
   let orderAppService: OrderAppService;
   let useCase: CreateOrderUseCase;
@@ -20,7 +16,6 @@ describe('CreateOrderUseCase (integration)', () => {
 
   beforeEach(async () => {
     orderRepository = new PrismaOrderRepository();
-    productRepository = new ProductRepository();
     eventPublisher = new InMemoryDomainEventPublisher();
     orderAppService = new OrderAppService(orderRepository, eventPublisher);
     useCase = new CreateOrderUseCase(orderAppService, eventPublisher);
