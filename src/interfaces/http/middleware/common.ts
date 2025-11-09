@@ -38,10 +38,26 @@ export const errorHandler: MiddlewareHandler = async (c, next) => {
 // 請求日誌中間件
 export const requestLogger: MiddlewareHandler = async (c, next) => {
   const start = Date.now();
+  const isDebug = process.env.DEBUG === '*' || process.env.NODE_ENV === 'development';
+  
+  if (isDebug) {
+    console.log(`🔍 [${new Date().toISOString()}] ${c.req.method} ${c.req.url}`);
+    console.log(`   Headers:`, Object.fromEntries(c.req.raw.headers));
+    
+    // 如果有 body，嘗試記錄（僅用於調試）
+    if (c.req.method !== 'GET' && c.req.method !== 'HEAD') {
+      console.log(`   Body: [Request body will be processed by handler]`);
+    }
+  }
   
   await next();
   
   const duration = Date.now() - start;
+  
+  if (isDebug) {
+    console.log(`✅ [${new Date().toISOString()}] ${c.req.method} ${c.req.url} - ${c.res.status} (${duration}ms)`);
+  }
+  
   logger.info('Request completed', {
     method: c.req.method,
     url: c.req.url,

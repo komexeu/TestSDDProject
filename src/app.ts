@@ -64,7 +64,7 @@ function createApp() {
 
   // API 路由
   app.route('/api', createProductRoutes(productController));
-  app.route('/', createInventoryRoutes(inventoryController));
+  app.route('/api', createInventoryRoutes(inventoryController));
   app.route('/api', createOrderRoutes(orderController));
 
   return app;

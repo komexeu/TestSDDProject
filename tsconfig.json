@@ -8,6 +8,9 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "outDir": "dist",
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
     "baseUrl": "./src",
     "paths": {
       "@core/*": ["core/*"],
