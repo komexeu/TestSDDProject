@@ -1,5 +1,6 @@
 import { CreateOrderUseCase } from '@domains/order/application/use-cases/create-order/create-order.usecase';
 import { GetOrderDetailQueryHandler } from '@domains/order/application/queries/get-order-detail.query';
+import { GetOrderListQueryHandler } from '@domains/order/application/queries/get-order-list.query';
 import { OrderAppService } from '@domains/order/application/service/order-app-service';
 import { PrismaOrderRepository } from '@domains/order/infrastructure/repositories/prisma-order-repository';
 import { DomainEventPublisher } from '@shared/domain/events/domain-event';
@@ -31,6 +32,27 @@ export class OrderController {
       if (!result) {
         return c.json({ message: '查無此訂單' }, 404);
       }
+      return c.json(result, 200);
+    } catch (error) {
+      return c.json({ message: error instanceof Error ? error.message : 'Unknown error' }, 500);
+    }
+  }
+
+  async getOrderList(c: Context) {
+    try {
+      const limit = Number(c.req.query('limit')) || 10;
+      const offset = Number(c.req.query('offset')) || 0;
+      const userId = c.req.query('userId');
+      const status = c.req.query('status');
+
+      const queryHandler = new GetOrderListQueryHandler(this.orderRepository);
+      const result = await queryHandler.execute({
+        limit,
+        offset,
+        userId,
+        status,
+      });
+      
       return c.json(result, 200);
     } catch (error) {
       return c.json({ message: error instanceof Error ? error.message : 'Unknown error' }, 500);

@@ -1,8 +1,11 @@
 openapi: 3.0.3
 info:
-  title: Order API
+  title: Order Management API
   version: 1.0.0
-  description: 訂單建立與查詢 API 介面約定
+  description: 訂單管理系統 API - 包含訂單建立、查詢、狀態管理和編輯功能
+servers:
+  - url: /api
+    description: API 基礎路徑
 paths:
   /orders:
     post:
@@ -40,6 +43,189 @@ paths:
                 $ref: '#/components/schemas/OrderDetail'
         '404':
           description: 查無此訂單
+    put:
+      summary: 編輯訂單
+      parameters:
+        - in: path
+          name: orderId
+          required: true
+          schema:
+            type: string
+          description: 訂單ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditOrderRequest'
+      responses:
+        '200':
+          description: 訂單更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateOrderResponse'
+        '404':
+          description: 查無此訂單
+        '400':
+          description: 請求參數錯誤或訂單狀態不允許編輯
+  /orders/list:
+    get:
+      summary: 查詢訂單列表
+      parameters:
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+          description: 限制返回筆數
+        - in: query
+          name: offset
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          description: 跳過筆數（用於分頁）
+        - in: query
+          name: userId
+          required: false
+          schema:
+            type: string
+          description: 按使用者 ID 篩選
+        - in: query
+          name: status
+          required: false
+          schema:
+            type: string
+          description: 按狀態篩選
+      responses:
+        '200':
+          description: 查詢成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderListResponse'
+        '500':
+          description: 內部伺服器錯誤
+  /orders/{orderId}/confirm:
+    post:
+      summary: 櫃檯確認訂單
+      parameters:
+        - in: path
+          name: orderId
+          required: true
+          schema:
+            type: string
+          description: 訂單ID
+      responses:
+        '200':
+          description: 訂單已確認
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderStatusResponse'
+        '404':
+          description: 查無此訂單
+        '400':
+          description: 訂單狀態不允許此操作
+  /orders/{orderId}/cancel:
+    post:
+      summary: 取消訂單
+      parameters:
+        - in: path
+          name: orderId
+          required: true
+          schema:
+            type: string
+          description: 訂單ID
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  description: 取消原因
+      responses:
+        '200':
+          description: 訂單已取消
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderStatusResponse'
+        '404':
+          description: 查無此訂單
+        '400':
+          description: 訂單狀態不允許此操作
+  /orders/{orderId}/start-preparation:
+    post:
+      summary: 開始製作餐點
+      parameters:
+        - in: path
+          name: orderId
+          required: true
+          schema:
+            type: string
+          description: 訂單ID
+      responses:
+        '200':
+          description: 已開始製作
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderStatusResponse'
+        '404':
+          description: 查無此訂單
+        '400':
+          description: 訂單狀態不允許此操作
+  /orders/{orderId}/ready-for-pickup:
+    post:
+      summary: 標記餐點可取餐
+      parameters:
+        - in: path
+          name: orderId
+          required: true
+          schema:
+            type: string
+          description: 訂單ID
+      responses:
+        '200':
+          description: 餐點已可取餐
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderStatusResponse'
+        '404':
+          description: 查無此訂單
+        '400':
+          description: 訂單狀態不允許此操作
+  /orders/{orderId}/complete:
+    post:
+      summary: 完成訂單（已取餐）
+      parameters:
+        - in: path
+          name: orderId
+          required: true
+          schema:
+            type: string
+          description: 訂單ID
+      responses:
+        '200':
+          description: 訂單已完成
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderStatusResponse'
+        '404':
+          description: 查無此訂單
+        '400':
+          description: 訂單狀態不允許此操作
 components:
   schemas:
     CreateOrderRequest:
@@ -119,3 +305,79 @@ components:
     OrderDetail:
       allOf:
         - $ref: '#/components/schemas/CreateOrderResponse'
+    OrderListResponse:
+      type: object
+      properties:
+        orders:
+          type: array
+          description: 訂單列表
+          items:
+            $ref: '#/components/schemas/OrderSummary'
+        total:
+          type: integer
+          description: 符合條件的訂單總數
+        hasMore:
+          type: boolean
+          description: 是否還有更多訂單
+    OrderSummary:
+      type: object
+      properties:
+        orderId:
+          type: string
+          description: 訂單ID
+        userId:
+          type: string
+          description: 使用者ID
+        description:
+          type: string
+          description: 訂單描述
+        status:
+          type: string
+          description: 訂單狀態
+        totalAmount:
+          type: integer
+          description: 訂單總金額
+        itemCount:
+          type: integer
+          description: 訂單項目數量
+        createdAt:
+          type: string
+          format: date-time
+          description: 建立時間
+    OrderStatusResponse:
+      type: object
+      properties:
+        orderId:
+          type: string
+          description: 訂單ID
+        status:
+          type: string
+          description: 更新後的訂單狀態
+          enum:
+            - "已點餐"
+            - "已確認訂單"
+            - "製作中"
+            - "可取餐"
+            - "已取餐完成"
+            - "已取消"
+            - "失敗"
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新時間
+        message:
+          type: string
+          description: 狀態變更訊息
+    EditOrderRequest:
+      type: object
+      properties:
+        items:
+          type: array
+          description: 更新後的訂單明細
+          items:
+            $ref: '#/components/schemas/OrderItemInput'
+        description:
+          type: string
+          description: 更新後的備註
+      required:
+        - items

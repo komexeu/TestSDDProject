@@ -5,6 +5,7 @@ export function createOrderRoutes(orderController: OrderController): Hono {
     const orderRoutes = new Hono();
 
     orderRoutes.post('/orders', (c) => orderController.createOrder(c));
+    orderRoutes.get('/orders/list', (c) => orderController.getOrderList(c));
     orderRoutes.get('/orders/:orderId', (c) => orderController.getOrderDetail(c));
 
     return orderRoutes;

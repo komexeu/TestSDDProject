@@ -1,6 +1,6 @@
 
 import { PrismaClient } from '@prisma/client';
-import { OrderRepository } from '@domains/order/domain/repositories/order-repository';
+import { OrderRepository, FindAllOptions, FindAllResult } from '@domains/order/domain/repositories/order-repository';
 import { Order as OrderDomain, OrderId, UserId } from '@domains/order/domain/entities/order';
 import { OrderItem } from '@domains/order/domain/value-objects/order-item';
 
@@ -23,6 +23,34 @@ export class PrismaOrderRepository implements OrderRepository {
       include: { items: true },
     });
     return orders.map((o) => this.toDomain(o));
+  }
+
+  async findAll(options: FindAllOptions): Promise<FindAllResult> {
+    // 建立查詢條件
+    const where: any = { isDelete: false };
+    if (options.userId) {
+      where.userId = options.userId;
+    }
+    if (options.status) {
+      where.status = options.status;
+    }
+
+    // 執行查詢和計算總數
+    const [orders, total] = await Promise.all([
+      prisma.order.findMany({
+        where,
+        include: { items: true },
+        orderBy: { createdAt: 'desc' },
+        take: options.limit,
+        skip: options.offset,
+      }),
+      prisma.order.count({ where }),
+    ]);
+
+    return {
+      orders: orders.map((o) => this.toDomain(o)),
+      total,
+    };
   }
 
   async create(order: OrderDomain): Promise<string> {
