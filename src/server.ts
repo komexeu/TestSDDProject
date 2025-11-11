@@ -1,3 +1,5 @@
+
+console.log('=== server.ts is running ===');
 import { serve } from '@hono/node-server';
 import app from './app';
 

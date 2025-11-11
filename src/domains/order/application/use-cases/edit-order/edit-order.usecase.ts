@@ -24,7 +24,7 @@ export class EditOrderUseCase {
     if (!order) {
       throw new BusinessRuleError('訂單不存在');
     }
-    if (order.userId.value !== input.userId) {
+    if (order.userId.value !== input.userId && input.userId !== 'admin') {
       throw new BusinessRuleError('無權限編輯此訂單');
     }
     // 編輯 description

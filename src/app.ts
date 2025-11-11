@@ -20,7 +20,7 @@ function setupDependencies() {
   // 控制器（暫時使用簡化版本）
   const productController = new ProductController();
   const inventoryController = new InventoryController();
-  
+
   // Order 相關依賴注入
   const orderRepository = new PrismaOrderRepository();
   const eventPublisher = new InMemoryDomainEventPublisher();
@@ -39,12 +39,15 @@ function createApp() {
   const app = new Hono();
 
   // CORS 中間件 - 允許端口 5173 的請求
+  console.log('CORS middleware is being registered');
   app.use('*', cors({
-    origin: ['http://localhost:5173', 'http://127.0.0.1:5173','http://localhost:5174', 'http://127.0.0.1:5174'],
+    origin: ['http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:5174', 'http://127.0.0.1:5174'],
     credentials: true,
-    allowHeaders: ['Content-Type', 'Authorization'],
-    allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+    allowHeaders: ['Content-Type', 'Authorization', 'X-User-Id', 'x-user-id'],
+    allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    exposeHeaders: ['x-user-id', 'X-User-Id']
   }));
+  console.log('CORS middleware registered');
 
   // 全域中間件
   app.use('*', requestLogger);

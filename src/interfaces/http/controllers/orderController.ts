@@ -13,6 +13,22 @@ export class OrderController {
     private readonly eventPublisher: DomainEventPublisher
   ) {}
 
+  async editOrder(c: Context) {
+    try {
+      const orderId = c.req.param('orderId');
+      const userId = c.req.header('x-user-id') || '';
+      const body = await c.req.json();
+      // 允許 description, items
+      const { description, items } = body;
+      const { EditOrderUseCase } = await import('@domains/order/application/use-cases/edit-order/edit-order.usecase');
+      const useCase = new EditOrderUseCase(this.orderRepository);
+      await useCase.execute({ orderId, userId, description, items });
+      return c.json({ message: '訂單已更新' }, 200);
+    } catch (error) {
+      return c.json({ message: error instanceof Error ? error.message : 'Unknown error' }, 400);
+    }
+  }
+
   async createOrder(c: Context) {
     try {
       const body = await c.req.json();

@@ -7,7 +7,8 @@
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "outDir": "dist",
+  "outDir": "dist",
+  "rootDir": "./src",
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
@@ -21,6 +22,6 @@
       "@tests/*": ["../tests-vitest/*"]
     }
   },
-  "include": ["src/**/*", "tests-vitest/**/*"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
 }
