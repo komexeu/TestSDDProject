@@ -1,38 +1,19 @@
+import 'reflect-metadata';
+import './scripts/register-di';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { errorHandler, requestLogger } from '@interfaces/http/middleware/common';
 import { createProductRoutes } from '@interfaces/http/routes/product-routes';
 import { createInventoryRoutes } from '@interfaces/http/routes/inventory-routes';
-import { createOrderRoutes } from '@interfaces/http/routes/orderRoutes';
+import { createOrderRoutes } from '@interfaces/http/routes/order-routes';
 
 // 控制器
 import { ProductController } from '@interfaces/http/controllers/product-controller';
 import { InventoryController } from '@interfaces/http/controllers/inventory-controller';
-import { OrderController } from '@interfaces/http/controllers/orderController';
+import { OrderController } from '@interfaces/http/controllers/order-controller';
 
-// Order 相關依賴
-import { OrderAppService } from '@domains/order/application/service/order-app-service';
-import { PrismaOrderRepository } from '@domains/order/infrastructure/repositories/prisma-order-repository';
-import { InMemoryDomainEventPublisher } from '@shared/domain/events/domain-event';
+import { container } from 'tsyringe';
 
-// 依賴注入設定
-function setupDependencies() {
-  // 控制器（暫時使用簡化版本）
-  const productController = new ProductController();
-  const inventoryController = new InventoryController();
-
-  // Order 相關依賴注入
-  const orderRepository = new PrismaOrderRepository();
-  const eventPublisher = new InMemoryDomainEventPublisher();
-  const orderAppService = new OrderAppService(orderRepository, eventPublisher);
-  const orderController = new OrderController(orderAppService, orderRepository, eventPublisher);
-
-  return {
-    productController,
-    inventoryController,
-    orderController
-  };
-}
 
 // 建立應用程式
 function createApp() {
@@ -53,8 +34,10 @@ function createApp() {
   app.use('*', requestLogger);
   app.use('*', errorHandler);
 
-  // 設定依賴
-  const { productController, inventoryController, orderController } = setupDependencies();
+  // 直接用 tsyringe 取得 controller 實例
+  const productController = container.resolve(ProductController);
+  const orderController = container.resolve(OrderController);
+  const inventoryController = new InventoryController();
 
   // 健康檢查
   app.get('/health', (c) => {

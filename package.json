@@ -7,12 +7,12 @@
     "test:watch": "cross-env NODE_ENV=test dotenv -e .env.test npx vitest --dir=tests-vitest",
     "test:ui": "cross-env NODE_ENV=test dotenv -e .env.test npx vitest --ui --dir=tests-vitest",
     "resetDb": "npx prisma migrate reset --preview-feature",
-  "build": "tsc && tsc-alias",
-  "dev": "npm run build && node dist/src/server.js",
-  "dev:debug": "npm run build && DEBUG=* node --inspect dist/src/server.js",
-  "dev:watch": "tsc -w & sleep 2 && nodemon",
-  "debug": "npm run build && node --inspect-brk dist/src/server.js",
-  "start": "npm run build && node dist/src/server.js",
+    "build": "tsc && tsc-alias",
+    "dev": "npm run build && node dist/src/server.js",
+    "dev:debug": "npm run build && DEBUG=* node --inspect dist/src/server.js",
+    "dev:watch": "tsc -w & sleep 2 && nodemon",
+    "debug": "npm run build && node --inspect-brk dist/src/server.js",
+    "start": "npm run build && node dist/src/server.js",
     "generate-tests": "node scripts/generate-test-structure.js",
     "prepare": "husky install"
   },
@@ -39,6 +39,9 @@
   "dependencies": {
     "@hono/node-server": "^1.19.5",
     "@prisma/client": "^6.1.0",
-    "@prisma/extension-accelerate": "^2.0.2"
+    "@prisma/extension-accelerate": "^2.0.2",
+    "fast-glob": "^3.3.3",
+    "reflect-metadata": "^0.2.2",
+    "tsyringe": "^4.10.0"
   }
 }

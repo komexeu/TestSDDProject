@@ -1,3 +1,4 @@
+import { injectable, inject } from 'tsyringe';
 // OrderAppService 範例：DDD Application Layer 完整流程
 // 1. 執行業務邏輯（如取消訂單）
 // 2. 儲存聚合根到 DB
@@ -13,6 +14,7 @@ import { PrismaOrderRepository } from '@domains/order/infrastructure/repositorie
 /**
  * 訂單應用服務，協調聚合根與倉儲，執行業務邏輯
  */
+@injectable()
 export class OrderAppService {
   /**
    * 建立訂單
@@ -47,7 +49,7 @@ export class OrderAppService {
    */
   constructor(
     private readonly orderRepository: PrismaOrderRepository,
-    private readonly eventPublisher: DomainEventPublisher
+    @inject('DomainEventPublisher') private readonly eventPublisher: DomainEventPublisher
   ) {}
 
   // 取消訂單

@@ -1,8 +1,10 @@
+import { injectable } from 'tsyringe';
 import { Order } from '@domains/order/domain/entities/order';
 import { OrderStatus } from '@domains/order/domain/value-objects/order-status';
 import { BusinessRuleError } from '@shared/application/exceptions';
 
 // 訂單狀態機領域服務
+@injectable()
 export class OrderStateMachineService {
   /**
    * 狀態轉換規則

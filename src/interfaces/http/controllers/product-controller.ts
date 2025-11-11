@@ -1,108 +1,69 @@
+import { injectable, inject } from 'tsyringe';
+
 import { Context } from 'hono';
-import { ValidationError } from '@shared/application/exceptions';
+import { ValidationError, NotFoundError } from '@shared/application/exceptions';
+import { CreateProductUseCase } from '@domains/product/application/use-cases/create-product';
+import { GetProductUseCase } from '@domains/product/application/use-cases/get-product';
+import { UpdateProductUseCase } from '@domains/product/application/use-cases/update-product';
+import { ListProductsUseCase } from '@domains/product/application/use-cases/list-products';
+import { CreateProductRequest, UpdateProductRequest, GetProductRequest, ListProductsRequest } from '@domains/product/application/dto/product-dto';
 
-// 臨時簡化的產品控制器（暫時不依賴用例）
+@injectable()
 export class ProductController {
-  constructor() {}
+  constructor(
+    @inject('CreateProductUseCase') private readonly createProductUseCase: CreateProductUseCase,
+    @inject('GetProductUseCase') private readonly getProductUseCase: GetProductUseCase,
+    @inject('UpdateProductUseCase') private readonly updateProductUseCase: UpdateProductUseCase,
+    @inject('ListProductsUseCase') private readonly listProductsUseCase: ListProductsUseCase
+  ) {}
 
-  // 建立產品
   async createProduct(c: Context) {
-    const data = await c.req.json();
-    
-    // 基本驗證
-    if (!data.name || typeof data.name !== 'string' || data.name.trim() === '') {
-      throw new ValidationError('商品名稱不得為空', 'name');
-    }
-    if (!data.description || typeof data.description !== 'string') {
-      throw new ValidationError('商品描述不得為空', 'description');
-    }
-    if (typeof data.price !== 'number' || !Number.isInteger(data.price) || data.price <= 0) {
-      throw new ValidationError('售價必須為大於 0 的整數（新台幣元）', 'price');
-    }
-
-    // 模擬回應
-    const result = {
-      id: crypto.randomUUID(),
-      name: data.name,
-      description: data.description,
-      price: data.price,
-      code: data.code,
-      isActive: true,
-      createdAt: new Date()
-    };
-
-    return c.json(result, 201 as any);
+    const data = await c.req.json<CreateProductRequest>();
+    // 這裡可加額外驗證
+    const result = await this.createProductUseCase.execute(data);
+    return c.json(result, 201);
   }
 
-  // 取得產品詳情
   async getProduct(c: Context) {
     const productId = c.req.param('id');
-    
-    // 模擬回應
-    const result = {
-      id: productId,
-      name: '示例產品',
-      description: '這是一個示例產品',
-      price: 100,
-      code: 'DEMO001',
-      isActive: true,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-
-    return c.json(result);
+    const req: GetProductRequest = { productId };
+    try {
+      const result = await this.getProductUseCase.execute(req);
+      return c.json(result);
+    } catch (err) {
+      if (err instanceof NotFoundError) {
+        return c.json({ message: '找不到產品' }, 404);
+      }
+      throw err;
+    }
   }
 
-  // 更新產品
   async updateProduct(c: Context) {
     const productId = c.req.param('id');
-    const data = await c.req.json();
-
-    // 模擬回應
-    const result = {
-      id: productId,
-      name: data.name || '更新的產品',
-      description: data.description || '更新的描述',
-      price: data.price || 150,
-      code: data.code,
-      isActive: true,
-      updatedAt: new Date()
-    };
-
-    return c.json(result);
+    const data = await c.req.json<UpdateProductRequest>();
+    const req: UpdateProductRequest = { ...data, productId };
+    try {
+      const result = await this.updateProductUseCase.execute(req);
+      return c.json(result);
+    } catch (err) {
+      if (err instanceof NotFoundError) {
+        return c.json({ message: '找不到產品' }, 404);
+      }
+      throw err;
+    }
   }
 
-  // 查詢產品列表
   async listProducts(c: Context) {
     const query = c.req.query();
-    
-    // 模擬回應
-    const result = {
-      products: [
-        {
-          id: '1',
-          name: '產品 1',
-          description: '產品 1 描述',
-          price: 100,
-          code: 'PRD001',
-          isActive: true,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        },
-        {
-          id: '2',
-          name: '產品 2',
-          description: '產品 2 描述',
-          price: 200,
-          code: 'PRD002',
-          isActive: true,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        }
-      ],
-      total: 2
+    const req: ListProductsRequest = {
+      name: query.name,
+      minPrice: query.minPrice ? Number(query.minPrice) : undefined,
+      maxPrice: query.maxPrice ? Number(query.maxPrice) : undefined,
+      isActive: query.isActive ? query.isActive === 'true' : undefined,
+      sortBy: query.sortBy,
+      order: query.order as 'asc' | 'desc' | undefined
     };
-
+    const result = await this.listProductsUseCase.execute(req);
     return c.json(result);
   }
 }

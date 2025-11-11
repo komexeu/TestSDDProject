@@ -1,3 +1,4 @@
+import { injectable } from 'tsyringe';
 import { PrismaClient } from '@prisma/client';
 import { IProductRepository, IProductQueryRepository } from '@domains/product/domain/repositories/product-repository';
 import { Product, ProductId } from '@domains/product/domain/entities/product';
@@ -5,6 +6,7 @@ import { ProductName } from '@domains/product/domain/value-objects/product-prope
 
 const prisma = new PrismaClient();
 
+@injectable()
 export class ProductRepository implements IProductRepository {
   async findById(id: ProductId): Promise<Product | null> {
     const data = await prisma.product.findUnique({ where: { id: id.value } });
@@ -45,6 +47,7 @@ export class ProductRepository implements IProductRepository {
   }
 }
 
+@injectable()
 export class ProductQueryRepository implements IProductQueryRepository {
   async findByNamePattern(pattern: string): Promise<Product[]> {
     const data = await prisma.product.findMany({

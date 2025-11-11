@@ -1,3 +1,4 @@
+import { injectable } from 'tsyringe';
 
 import { PrismaClient } from '@prisma/client';
 import { OrderRepository, FindAllOptions, FindAllResult } from '@domains/order/domain/repositories/order-repository';
@@ -6,6 +7,7 @@ import { OrderItem } from '@domains/order/domain/value-objects/order-item';
 
 const prisma = new PrismaClient();
 
+@injectable()
 export class PrismaOrderRepository implements OrderRepository {
 
   async findById(id: string): Promise<OrderDomain | null> {

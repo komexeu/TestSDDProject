@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, vi } from 'vitest';
 import { Hono } from 'hono';
-import { OrderController } from '../../../src/interfaces/http/controllers/orderController';
-import { createOrderRoutes } from '../../../src/interfaces/http/routes/orderRoutes';
+import { OrderController } from '../../../src/interfaces/http/controllers/order-controller';
+import { createOrderRoutes } from '../../../src/interfaces/http/routes/order-routes';
 import { OrderAppService } from '../../../src/domains/order/application/service/order-app-service';
 import { PrismaOrderRepository } from '../../../src/domains/order/infrastructure/repositories/prisma-order-repository';
 import { DomainEventPublisher } from '../../../src/shared/domain/events/domain-event';

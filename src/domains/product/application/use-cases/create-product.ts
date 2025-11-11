@@ -1,4 +1,5 @@
 import { UseCase } from '@shared/application/interfaces/use-case';
+import { injectable, inject } from 'tsyringe';
 import { CreateProductRequest, CreateProductResponse } from '../dto/product-dto';
 import { IProductRepository } from '@domains/product/domain/repositories/product-repository';
 import { Product } from '@domains/product/domain/entities/product';
@@ -6,12 +7,12 @@ import { ProductName, ProductDescription, ProductPrice, ProductCode } from '@dom
 import { ProductManagementService } from '@domains/product/domain/services/product-management';
 import { DomainEventPublisher } from '@shared/domain/events/domain-event';
 import { ValidationError } from '@shared/application/exceptions';
-
+@injectable()
 export class CreateProductUseCase implements UseCase<CreateProductRequest, CreateProductResponse> {
   constructor(
-    private readonly productRepository: IProductRepository,
-    private readonly productManagementService: ProductManagementService,
-    private readonly eventPublisher: DomainEventPublisher
+    @inject('ProductRepository') private readonly productRepository: IProductRepository,
+    @inject('ProductManagementService') private readonly productManagementService: ProductManagementService,
+    @inject('DomainEventPublisher') private readonly eventPublisher: DomainEventPublisher
   ) { }
 
   async execute(request: CreateProductRequest): Promise<CreateProductResponse> {

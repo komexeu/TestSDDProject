@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { OrderController } from '../controllers/orderController';
+import { OrderController } from '../controllers/order-controller';
 
 export function createOrderRoutes(orderController: OrderController): Hono {
     const orderRoutes = new Hono();

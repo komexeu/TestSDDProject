@@ -1,11 +1,13 @@
+import { injectable, inject } from 'tsyringe';
 import { Product } from '@domains/product/domain/entities/product';
 import { ProductName } from '@domains/product/domain/value-objects/product-properties';
 import { IProductRepository } from '@domains/product/domain/repositories/product-repository';
 import { BusinessRuleError } from '@shared/application/exceptions';
 
 // 產品管理領域服務
+@injectable()
 export class ProductManagementService {
-  constructor(private readonly productRepository: IProductRepository) {}
+  constructor(@inject('ProductRepository') private readonly productRepository: IProductRepository) {}
 
   /**
    * 驗證產品名稱是否唯一

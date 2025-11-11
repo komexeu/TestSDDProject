@@ -1,9 +1,10 @@
 import { UseCase } from '@shared/application/interfaces/use-case';
+import { injectable, inject } from 'tsyringe';
 import { ListProductsRequest, ListProductsResponse } from '../dto/product-dto';
 import { IProductQueryRepository } from '@domains/product/domain/repositories/product-repository';
-
+@injectable()
 export class ListProductsUseCase implements UseCase<ListProductsRequest, ListProductsResponse> {
-  constructor(private readonly productQueryRepository: IProductQueryRepository) {}
+  constructor(@inject('ProductQueryRepository') private readonly productQueryRepository: IProductQueryRepository) {}
 
   async execute(request: ListProductsRequest): Promise<ListProductsResponse> {
     const products = await this.productQueryRepository.findByFilters({

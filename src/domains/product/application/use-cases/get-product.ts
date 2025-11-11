@@ -1,11 +1,12 @@
 import { UseCase } from '@shared/application/interfaces/use-case';
+import { injectable, inject } from 'tsyringe';
 import { GetProductRequest, GetProductResponse } from '../dto/product-dto';
 import { IProductRepository } from '@domains/product/domain/repositories/product-repository';
 import { ProductId } from '@domains/product/domain/entities/product';
 import { NotFoundError } from '@shared/application/exceptions';
-
+@injectable()
 export class GetProductUseCase implements UseCase<GetProductRequest, GetProductResponse> {
-  constructor(private readonly productRepository: IProductRepository) {}
+  constructor(@inject('ProductRepository') private readonly productRepository: IProductRepository) {}
 
   async execute(request: GetProductRequest): Promise<GetProductResponse> {
     const productId = new ProductId(request.productId);

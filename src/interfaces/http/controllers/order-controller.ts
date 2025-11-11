@@ -1,3 +1,4 @@
+import { injectable, inject } from 'tsyringe';
 import { CreateOrderUseCase } from '@domains/order/application/use-cases/create-order/create-order.usecase';
 import { GetOrderDetailQueryHandler } from '@domains/order/application/queries/get-order-detail.query';
 import { GetOrderListQueryHandler } from '@domains/order/application/queries/get-order-list.query';
@@ -6,11 +7,12 @@ import { PrismaOrderRepository } from '@domains/order/infrastructure/repositorie
 import { DomainEventPublisher } from '@shared/domain/events/domain-event';
 import { Context } from 'hono';
 
+@injectable()
 export class OrderController {
   constructor(
-    private readonly orderAppService: OrderAppService,
-    private readonly orderRepository: PrismaOrderRepository,
-    private readonly eventPublisher: DomainEventPublisher
+    @inject('OrderAppService') private readonly orderAppService: OrderAppService,
+    @inject('OrderRepository') private readonly orderRepository: PrismaOrderRepository,
+    @inject('DomainEventPublisher') private readonly eventPublisher: DomainEventPublisher
   ) {}
 
   async editOrder(c: Context) {

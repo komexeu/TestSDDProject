@@ -21,6 +21,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Product'
+  /products/list:
     get:
       summary: 查詢商品列表
       parameters:
