@@ -11,6 +11,8 @@ import { createOrderRoutes } from '@interfaces/http/routes/order-routes';
 import { ProductController } from '@interfaces/http/controllers/product-controller';
 import { InventoryController } from '@interfaces/http/controllers/inventory-controller';
 import { OrderController } from '@interfaces/http/controllers/order-controller';
+import { LineAuthController } from '@interfaces/http/controllers/line-auth-controller';
+import { createAuthRoutes } from '@interfaces/http/routes/line-auth-routes';
 
 import { container } from 'tsyringe';
 
@@ -38,6 +40,7 @@ function createApp() {
   const productController = container.resolve(ProductController);
   const orderController = container.resolve(OrderController);
   const inventoryController = new InventoryController();
+  const lineAuthController = container.resolve(LineAuthController);
 
   // 健康檢查
   app.get('/health', (c) => {
@@ -52,7 +55,7 @@ function createApp() {
   app.route('/api', createProductRoutes(productController));
   app.route('/api', createInventoryRoutes(inventoryController));
   app.route('/api', createOrderRoutes(orderController));
-
+  app.route('/api', createAuthRoutes(lineAuthController));
   return app;
 }
 
