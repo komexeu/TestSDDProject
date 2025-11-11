@@ -226,6 +226,120 @@ paths:
           description: 查無此訂單
         '400':
           description: 訂單狀態不允許此操作
+  # 商品相關 API
+  /products:
+    get:
+      summary: 取得商品列表
+      parameters:
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+          description: 限制返回筆數
+        - in: query
+          name: offset
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          description: 跳過筆數（用於分頁）
+        - in: query
+          name: keyword
+          required: false
+          schema:
+            type: string
+          description: 關鍵字搜尋
+      responses:
+        '200':
+          description: 查詢成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductListResponse'
+        '500':
+          description: 內部伺服器錯誤
+    post:
+      summary: 建立商品
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProductRequest'
+      responses:
+        '201':
+          description: 商品建立成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          description: 請求參數錯誤
+
+  /products/{productId}:
+    get:
+      summary: 取得單一商品
+      parameters:
+        - in: path
+          name: productId
+          required: true
+          schema:
+            type: string
+          description: 商品ID
+      responses:
+        '200':
+          description: 查詢成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: 查無此商品
+    put:
+      summary: 更新商品
+      parameters:
+        - in: path
+          name: productId
+          required: true
+          schema:
+            type: string
+          description: 商品ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditProductRequest'
+      responses:
+        '200':
+          description: 商品更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: 查無此商品
+        '400':
+          description: 請求參數錯誤
+    delete:
+      summary: 刪除商品
+      parameters:
+        - in: path
+          name: productId
+          required: true
+          schema:
+            type: string
+          description: 商品ID
+      responses:
+        '204':
+          description: 商品已刪除
+        '404':
+          description: 查無此商品
 components:
   schemas:
     CreateOrderRequest:
@@ -337,9 +451,11 @@ components:
         totalAmount:
           type: integer
           description: 訂單總金額
-        itemCount:
-          type: integer
-          description: 訂單項目數量
+        items:
+          type: array
+          description: 訂單明細（含數量與價格）
+          items:
+            $ref: '#/components/schemas/OrderItemOutput'
         createdAt:
           type: string
           format: date-time
@@ -381,3 +497,84 @@ components:
           description: 更新後的備註
       required:
         - items
+    # 商品相關 schema
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 商品ID
+        name:
+          type: string
+          description: 商品名稱
+        description:
+          type: string
+          description: 商品描述
+        price:
+          type: integer
+          description: 商品價格
+        code:
+          type: string
+          description: 商品代碼
+        isActive:
+          type: boolean
+          description: 是否啟用
+        createdAt:
+          type: string
+          format: date-time
+          description: 建立時間
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新時間
+    ProductListResponse:
+      type: object
+      properties:
+        products:
+          type: array
+          description: 商品列表
+          items:
+            $ref: '#/components/schemas/Product'
+        total:
+          type: integer
+          description: 符合條件的商品總數
+        hasMore:
+          type: boolean
+          description: 是否還有更多商品
+    CreateProductRequest:
+      type: object
+      required:
+        - name
+        - description
+        - price
+      properties:
+        name:
+          type: string
+          description: 商品名稱
+        description:
+          type: string
+          description: 商品描述
+        price:
+          type: integer
+          description: 商品價格
+        code:
+          type: string
+          description: 商品代碼（可選）
+    EditProductRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: 商品名稱
+        description:
+          type: string
+          description: 商品描述
+        price:
+          type: integer
+          description: 商品價格
+        code:
+          type: string
+          description: 商品代碼（可選）
+        isActive:
+          type: boolean
+          description: 是否啟用

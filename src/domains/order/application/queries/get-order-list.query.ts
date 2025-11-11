@@ -16,6 +16,8 @@ export interface GetOrderListQuery {
   status?: string;
 }
 
+import { OrderItemOutput } from '../../../../models/OrderItemOutput';
+
 export interface GetOrderListResult {
   orders: Array<{
     orderId: string;
@@ -23,7 +25,7 @@ export interface GetOrderListResult {
     description: string;
     status: string;
     totalAmount: number;
-    itemCount: number;
+    items: OrderItemOutput[];
     createdAt: Date;
   }>;
   total: number;
@@ -56,7 +58,13 @@ export class GetOrderListQueryHandler {
         description: order.description,
         status: order.status.value,
         totalAmount: order.totalAmount,
-        itemCount: order.items.length,
+        items: order.items.map(item => ({
+          id: item.id,
+          productId: item.productId,
+          name: item.name,
+          quantity: item.quantity,
+          price: item.price
+        })),
         createdAt: order.createdAt,
       })),
       total,
