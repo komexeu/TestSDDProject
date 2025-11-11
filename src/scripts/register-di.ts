@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import { container } from 'tsyringe';
 import fg from 'fast-glob';
 import path from 'path';

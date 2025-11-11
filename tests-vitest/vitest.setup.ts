@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { beforeAll } from 'vitest';
 import { PrismaClient } from '@prisma/client';
 
