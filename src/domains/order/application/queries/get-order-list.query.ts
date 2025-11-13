@@ -17,6 +17,7 @@ export interface GetOrderListQuery {
 }
 
 import { OrderItemOutput } from '../../../../models/OrderItemOutput';
+import { injectable } from 'tsyringe';
 
 export interface GetOrderListResult {
   orders: Array<{
@@ -32,8 +33,9 @@ export interface GetOrderListResult {
   hasMore: boolean;
 }
 
+@injectable()
 export class GetOrderListQueryHandler {
-  constructor(private readonly orderRepository: OrderRepository) {}
+  constructor(private readonly orderRepository: OrderRepository) { }
 
   /**
    * 查詢訂單列表
@@ -43,7 +45,7 @@ export class GetOrderListQueryHandler {
   async execute(query: GetOrderListQuery): Promise<GetOrderListResult> {
     const limit = query.limit || 10;
     const offset = query.offset || 0;
-    
+
     const { orders, total } = await this.orderRepository.findAll({
       limit,
       offset,

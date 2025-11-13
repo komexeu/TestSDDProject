@@ -3,8 +3,6 @@ import { CreateOrderUseCase } from '@domains/order/application/use-cases/create-
 import { GetOrderDetailQueryHandler } from '@domains/order/application/queries/get-order-detail.query';
 import { GetOrderListQueryHandler } from '@domains/order/application/queries/get-order-list.query';
 import { EditOrderUseCase } from '@domains/order/application/use-cases/edit-order/edit-order.usecase'
-import { OrderRepository } from '@domains/order/infrastructure/repositories/prisma-order-repository';
-import { DomainEventPublisher } from '@shared/domain/events/domain-event';
 import { Context } from 'hono';
 
 @injectable()
@@ -12,8 +10,8 @@ export class OrderController {
   constructor(
     @inject('CreateOrderUseCase') private readonly createOrderUseCase: CreateOrderUseCase,
     @inject('EditOrderUseCase') private readonly editOrderUseCase: EditOrderUseCase,
-    @inject('OrderRepository') private readonly orderRepository: OrderRepository,
-    @inject('DomainEventPublisher') private readonly eventPublisher: DomainEventPublisher
+    private readonly getOrderDetailQueryHandler: GetOrderDetailQueryHandler,
+    private readonly getOrderListQueryHandler: GetOrderListQueryHandler
   ) { }
 
   async editOrder(c: Context) {
@@ -43,8 +41,7 @@ export class OrderController {
   async getOrderDetail(c: Context) {
     try {
       const orderId = c.req.param('orderId');
-      const queryHandler = new GetOrderDetailQueryHandler(this.orderRepository);
-      const result = await queryHandler.execute({ orderId });
+      const result = await this.getOrderDetailQueryHandler.execute({ orderId });
       if (!result) {
         return c.json({ message: '查無此訂單' }, 404);
       }
@@ -61,8 +58,7 @@ export class OrderController {
       const userId = c.req.query('userId');
       const status = c.req.query('status');
 
-      const queryHandler = new GetOrderListQueryHandler(this.orderRepository);
-      const result = await queryHandler.execute({
+      const result = await this.getOrderListQueryHandler.execute({
         limit,
         offset,
         userId,

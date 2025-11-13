@@ -43,7 +43,8 @@ patterns.forEach(pattern => {
           name.endsWith('Repository') ||
           name.endsWith('Service') ||
           name.endsWith('Controller')||
-          name.endsWith('Publisher')
+          name.endsWith('Publisher') ||
+          name.endsWith('QueryHandler')
         )
       ) {
         // 類別註冊（原本）

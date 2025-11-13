@@ -3,6 +3,7 @@
  * Application Query 層，僅查詢，不發佈事件
  */
 import { OrderRepository } from '@domains/order/infrastructure/repositories/prisma-order-repository';
+import { injectable } from 'tsyringe';
 
 export interface GetOrderDetailQuery {
   orderId: string;
@@ -23,8 +24,9 @@ export interface GetOrderDetailResult {
   createdAt: Date;
 }
 
+@injectable()
 export class GetOrderDetailQueryHandler {
-  constructor(private readonly orderRepository: OrderRepository) {}
+  constructor(private readonly orderRepository: OrderRepository) { }
 
   /**
    * 查詢訂單明細
