@@ -3,19 +3,19 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { CreateOrderUseCase } from '@domains/order/application/use-cases/create-order/create-order.usecase';
 import { CreateOrderRequest } from '@domains/order/application/use-cases/create-order/create-order.dto';
 import { OrderAppService } from '@domains/order/application/service/order-app-service';
-import { PrismaOrderRepository } from '@domains/order/infrastructure/repositories/prisma-order-repository';
+import { OrderRepository } from '@domains/order/infrastructure/repositories/prisma-order-repository';
 import { InMemoryDomainEventPublisher } from '@shared/domain/events/domain-event';
 import { GetOrderDetailQueryHandler } from '@domains/order/application/queries/get-order-detail.query';
 
 describe('CreateOrderUseCase (integration)', () => {
-  let orderRepository: PrismaOrderRepository;
+  let orderRepository: OrderRepository;
   let eventPublisher: InMemoryDomainEventPublisher;
   let orderAppService: OrderAppService;
   let useCase: CreateOrderUseCase;
   let getOrderDetailQueryHandler: GetOrderDetailQueryHandler;
 
   beforeEach(async () => {
-    orderRepository = new PrismaOrderRepository();
+  orderRepository = new OrderRepository();
     eventPublisher = new InMemoryDomainEventPublisher();
     orderAppService = new OrderAppService(orderRepository, eventPublisher);
     useCase = new CreateOrderUseCase(orderAppService, eventPublisher);

@@ -1,13 +1,13 @@
 import { describe, it, expect, vi } from 'vitest';
 import { GetOrderListQueryHandler } from '../../../src/domains/order/application/queries/get-order-list.query';
-import { PrismaOrderRepository } from '../../../src/domains/order/infrastructure/repositories/prisma-order-repository';
+import { OrderRepository } from '../../../src/domains/order/infrastructure/repositories/prisma-order-repository';
 import { Order } from '../../../src/domains/order/domain/entities/order';
 import { OrderItem } from '../../../src/domains/order/domain/value-objects/order-item';
 import { OrderStatus } from '../../../src/domains/order/domain/value-objects/order-status';
 
 // Mock repository
 const mockFindAll = vi.fn();
-const mockRepo = { findAll: mockFindAll } as unknown as PrismaOrderRepository;
+const mockRepo = { findAll: mockFindAll } as unknown as OrderRepository;
 
 describe('GetOrderListQueryHandler', () => {
   it('should return orders with items array', async () => {

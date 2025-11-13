@@ -1,11 +1,11 @@
 
 import { describe, it, expect } from 'vitest';
 import { GetOrderListQueryHandler } from '../../../src/domains/order/application/queries/get-order-list.query';
-import { PrismaOrderRepository } from '../../../src/domains/order/infrastructure/repositories/prisma-order-repository';
+import { OrderRepository } from '../../../src/domains/order/infrastructure/repositories/prisma-order-repository';
 
 describe('GetOrderListQueryHandler (integration, real repository)', () => {
   it('應該能查到訂單且每筆訂單 items 欄位正確 (直接 new repository)', async () => {
-    const repo = new PrismaOrderRepository();
+  const repo = new OrderRepository();
     const handler = new GetOrderListQueryHandler(repo);
     const result = await handler.execute({});
     expect(result.orders.length).toBeGreaterThan(0);

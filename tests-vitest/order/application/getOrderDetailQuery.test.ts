@@ -1,13 +1,13 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { GetOrderDetailQueryHandler } from '@domains/order/application/queries/get-order-detail.query';
-import { PrismaOrderRepository } from '@domains/order/infrastructure/repositories/prisma-order-repository';
+import { OrderRepository } from '@domains/order/infrastructure/repositories/prisma-order-repository';
 import { OrderAppService } from '@domains/order/application/service/order-app-service';
 import { CreateOrderUseCase } from '@domains/order/application/use-cases/create-order/create-order.usecase';
 import { InMemoryDomainEventPublisher } from '@shared/domain/events/domain-event';
 
 // 整合測試：先建立訂單，再用 Query 查詢
 describe('GetOrderDetailQueryHandler (integration with CreateOrderUseCase)', () => {
-  const orderRepository = new PrismaOrderRepository();
+  const orderRepository = new OrderRepository();
   const eventPublisher = new InMemoryDomainEventPublisher();
   const appService = new OrderAppService(orderRepository, eventPublisher);
   const createOrderUseCase = new CreateOrderUseCase(appService, eventPublisher);

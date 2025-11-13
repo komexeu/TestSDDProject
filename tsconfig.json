@@ -24,6 +24,6 @@
       "@tests/*": ["../tests-vitest/*"]
     }
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "tests-vitest/**/*"],
   "exclude": ["node_modules", "dist"]
 }

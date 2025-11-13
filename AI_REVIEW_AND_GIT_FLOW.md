@@ -4,12 +4,12 @@
 
 每次提交前，請依下列指令流程操作：
 
-1. 依照 ARCHITECTURE_RULES 規則審查
-2. 若審查通過，執行：
+Step 1. 讀取 ARCHITECTURE_RULES 進行 規則審查
+Step 2. 若審查通過，執行：
    - `git add .`
    - 顯示 git diff
    - commit
-3. 若審查不通過，回報違規，不執行 commit
+Step 3. 若審查不通過，回報違規，不執行 commit
 
 ## 標準指令範例
 

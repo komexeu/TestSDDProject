@@ -1,18 +1,18 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { PrismaOrderRepository } from '@domains/order/infrastructure/repositories/prisma-order-repository';
+import { OrderRepository } from '@domains/order/infrastructure/repositories/prisma-order-repository';
 import { EditOrderUseCase, EditOrderInput } from '@domains/order/application/use-cases/edit-order/edit-order.usecase';
 import { CreateOrderUseCase } from '@domains/order/application/use-cases/create-order/create-order.usecase';
 import { OrderAppService } from '@domains/order/application/service/order-app-service';
 import { InMemoryDomainEventPublisher } from '@shared/domain/events/domain-event';
 
 describe('EditOrderUseCase', () => {
-    let orderRepository: PrismaOrderRepository;
+    let orderRepository: OrderRepository;
     let useCase: EditOrderUseCase;
     let createOrderUseCase: CreateOrderUseCase;
     let orderId: string;
 
     beforeEach(async () => {
-        orderRepository = new PrismaOrderRepository();
+    orderRepository = new OrderRepository();
         useCase = new EditOrderUseCase(orderRepository);
         const eventPublisher = new InMemoryDomainEventPublisher();
         const appService = new OrderAppService(orderRepository, eventPublisher);

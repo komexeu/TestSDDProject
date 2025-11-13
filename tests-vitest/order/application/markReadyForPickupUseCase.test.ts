@@ -4,12 +4,12 @@ import { MarkReadyForPickupUseCase } from '@domains/order/application/use-cases/
 import { StartPreparationUseCase } from '@domains/order/application/use-cases/start-preparation/start-preparation.usecase';
 import { ConfirmOrderUseCase } from '@domains/order/application/use-cases/confirm-order/confirm-order.usecase';
 import { OrderAppService } from '@domains/order/application/service/order-app-service';
-import { PrismaOrderRepository } from '@domains/order/infrastructure/repositories/prisma-order-repository';
+import { OrderRepository } from '@domains/order/infrastructure/repositories/prisma-order-repository';
 import { InMemoryDomainEventPublisher } from '@shared/domain/events/domain-event';
 import { CreateOrderUseCase } from '@domains/order/application/use-cases/create-order/create-order.usecase';
 
 describe('MarkReadyForPickupUseCase (integration)', () => {
-  let orderRepository: PrismaOrderRepository;
+  let orderRepository: OrderRepository;
   let eventPublisher: InMemoryDomainEventPublisher;
   let orderAppService: OrderAppService;
   let useCase: MarkReadyForPickupUseCase;
@@ -19,7 +19,7 @@ describe('MarkReadyForPickupUseCase (integration)', () => {
   let confirmOrderUseCase: ConfirmOrderUseCase;
 
   beforeEach(async () => {
-    orderRepository = new PrismaOrderRepository();
+  orderRepository = new OrderRepository();
     eventPublisher = new InMemoryDomainEventPublisher();
     orderAppService = new OrderAppService(orderRepository, eventPublisher);
     useCase = new MarkReadyForPickupUseCase(orderAppService, eventPublisher);
