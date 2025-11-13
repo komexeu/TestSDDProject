@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>API Swagger 預覽總覽</title>
+  <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist/swagger-ui.css">
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2em; }
+    h1 { color: #2c3e50; }
+    #selector { margin-bottom: 2em; }
+    #swagger-ui { margin-top: 2em; }
+  </style>
+</head>
+<body>
+  <h1>API Swagger 文件預覽總覽</h1>
+  <div id="selector">
+    <label for="yaml-select">選擇 API 文件：</label>
+    <select id="yaml-select">
+      <option value="../specs/001-order-system-flow/contracts/openapi.yaml">訂單系統 API</option>
+      <option value="../specs/002-admin-product-management/contracts/openapi.yaml">商品管理 API</option>
+      <option value="../specs/003-inventory-feature/contracts/openapi.yaml">庫存管理 API</option>
+      <option value="../specs/004-create-order/contracts/openapi.yaml">建立訂單 API</option>
+    </select>
+    <button id="load-btn">載入 Swagger</button>
+  </div>
+  <div id="swagger-ui"></div>
+  <script src="https://unpkg.com/swagger-ui-dist/swagger-ui-bundle.js"></script>
+  <script>
+    let ui = null;
+    function renderSwagger(url) {
+      if (ui) {
+        document.getElementById('swagger-ui').innerHTML = '';
+      }
+      ui = SwaggerUIBundle({
+        url: url,
+        dom_id: '#swagger-ui',
+        presets: [SwaggerUIBundle.presets.apis],
+        layout: 'BaseLayout',
+        deepLinking: true
+      });
+    }
+    // 初始載入
+    renderSwagger(document.getElementById('yaml-select').value);
+    // 新增下拉選單觸發
+    document.getElementById('yaml-select').onchange = function() {
+      const url = this.value;
+      renderSwagger(url);
+    };
+  </script>
+</body>
+</html>

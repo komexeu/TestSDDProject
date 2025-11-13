@@ -1,15 +1,19 @@
 # AI自動審查與Git操作指令文件
 
-## 使用方式
+我現在要提交
+請執行以下操作
+
+## Steps
 
 每次提交前，請依下列指令流程操作：
 
 Step 1. 讀取 ARCHITECTURE_RULES 進行 規則審查
-Step 2. 若審查通過，執行：
+Step 2. 必須給我結果，搭配icon顯示所有檢查的檔案通過或不通過，如果有警告標記一下
+Step 3. 有結果後，執行：
    - `git add .`
    - 顯示 git diff
    - commit
-Step 3. 若審查不通過，回報違規，不執行 commit
+Step 4. 若審查不通過，回報違規，不執行 commit
 
 ## 標準指令範例
 

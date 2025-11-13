@@ -1,9 +1,13 @@
-openapi: 3.0.3
+openapi: 3.0.0
 info:
-  title: 點餐系統 API
+  title: 訂單系統 (Order) API
+  description: 訂單狀態、確認、取消、完成等功能
   version: 1.0.0
 servers:
   - url: /api
+tags:
+  - name: Order
+    description: 訂單相關 API
 paths:
   /orders:
     post:
@@ -75,13 +79,44 @@ paths:
           description: 訂單已完成
 components:
   schemas:
+    OrderItemOutput:
+      type: object
+      properties:
+        id:
+          type: string
+        productId:
+          type: string
+        name:
+          type: string
+        quantity:
+          type: integer
+        price:
+          type: number
+      required: [id, productId, name, quantity, price]
+    OrderStatus:
+      type: string
+      enum:
+        - 已點餐
+        - 已確認訂單
+        - 製作中
+        - 可取餐
+        - 已取餐完成
+        - 已取消
+        - 製作失敗
+        - 異常
     CreateOrderRequest:
       type: object
       properties:
+        userId:
+          type: string
         items:
           type: array
           items:
-            $ref: '#/components/schemas/Item'
+            $ref: '#/components/schemas/OrderItemOutput'
+        description:
+          type: string
+          nullable: true
+      required: [userId, items]
     Order:
       type: object
       properties:
@@ -89,36 +124,15 @@ components:
           type: string
         userId:
           type: string
-        status:
-          type: string
         items:
           type: array
           items:
-            $ref: '#/components/schemas/Item'
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-    Item:
-      type: object
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        quantity:
-          type: integer
-        price:
-          type: integer
-    OrderStatus:
-      type: object
-      properties:
-        orderId:
+            $ref: '#/components/schemas/OrderItemOutput'
+        description:
           type: string
         status:
+          $ref: '#/components/schemas/OrderStatus'
+        canceledBy:
           type: string
-        updatedAt:
-          type: string
-          format: date-time
+          nullable: true
+      required: [id, userId, items, status]

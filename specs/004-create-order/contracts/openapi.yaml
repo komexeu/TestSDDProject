@@ -1,11 +1,13 @@
-openapi: 3.0.3
+openapi: 3.0.0
 info:
-  title: Order Management API
+  title: 建立訂單 API
+  description: 訂單建立、查詢、編輯等功能
   version: 1.0.0
-  description: 訂單管理系統 API - 包含訂單建立、查詢、狀態管理和編輯功能
 servers:
   - url: /api
-    description: API 基礎路徑
+tags:
+  - name: Order
+    description: 訂單相關 API
 paths:
   /orders:
     post:
@@ -78,311 +80,78 @@ paths:
           required: false
           schema:
             type: integer
-            minimum: 1
-            maximum: 100
-            default: 10
-          description: 限制返回筆數
         - in: query
           name: offset
           required: false
           schema:
             type: integer
-            minimum: 0
-            default: 0
-          description: 跳過筆數（用於分頁）
-        - in: query
-          name: userId
-          required: false
-          schema:
-            type: string
-          description: 按使用者 ID 篩選
-        - in: query
-          name: status
-          required: false
-          schema:
-            type: string
-          description: 按狀態篩選
       responses:
         '200':
           description: 查詢成功
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OrderListResponse'
-        '500':
-          description: 內部伺服器錯誤
-  /orders/{orderId}/confirm:
-    post:
-      summary: 櫃檯確認訂單
-      parameters:
-        - in: path
-          name: orderId
-          required: true
-          schema:
-            type: string
-          description: 訂單ID
-      responses:
-        '200':
-          description: 訂單已確認
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrderStatusResponse'
-        '404':
-          description: 查無此訂單
-        '400':
-          description: 訂單狀態不允許此操作
-  /orders/{orderId}/cancel:
-    post:
-      summary: 取消訂單
-      parameters:
-        - in: path
-          name: orderId
-          required: true
-          schema:
-            type: string
-          description: 訂單ID
-      requestBody:
-        required: false
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                reason:
-                  type: string
-                  description: 取消原因
-      responses:
-        '200':
-          description: 訂單已取消
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrderStatusResponse'
-        '404':
-          description: 查無此訂單
-        '400':
-          description: 訂單狀態不允許此操作
-  /orders/{orderId}/start-preparation:
-    post:
-      summary: 開始製作餐點
-      parameters:
-        - in: path
-          name: orderId
-          required: true
-          schema:
-            type: string
-          description: 訂單ID
-      responses:
-        '200':
-          description: 已開始製作
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrderStatusResponse'
-        '404':
-          description: 查無此訂單
-        '400':
-          description: 訂單狀態不允許此操作
-  /orders/{orderId}/ready-for-pickup:
-    post:
-      summary: 標記餐點可取餐
-      parameters:
-        - in: path
-          name: orderId
-          required: true
-          schema:
-            type: string
-          description: 訂單ID
-      responses:
-        '200':
-          description: 餐點已可取餐
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrderStatusResponse'
-        '404':
-          description: 查無此訂單
-        '400':
-          description: 訂單狀態不允許此操作
-  /orders/{orderId}/complete:
-    post:
-      summary: 完成訂單（已取餐）
-      parameters:
-        - in: path
-          name: orderId
-          required: true
-          schema:
-            type: string
-          description: 訂單ID
-      responses:
-        '200':
-          description: 訂單已完成
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrderStatusResponse'
-        '404':
-          description: 查無此訂單
-        '400':
-          description: 訂單狀態不允許此操作
-  # 商品相關 API
-  /products:
-    get:
-      summary: 取得商品列表
-      parameters:
-        - in: query
-          name: limit
-          required: false
-          schema:
-            type: integer
-            minimum: 1
-            maximum: 100
-            default: 10
-          description: 限制返回筆數
-        - in: query
-          name: offset
-          required: false
-          schema:
-            type: integer
-            minimum: 0
-            default: 0
-          description: 跳過筆數（用於分頁）
-        - in: query
-          name: keyword
-          required: false
-          schema:
-            type: string
-          description: 關鍵字搜尋
-      responses:
-        '200':
-          description: 查詢成功
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProductListResponse'
-        '500':
-          description: 內部伺服器錯誤
-    post:
-      summary: 建立商品
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateProductRequest'
-      responses:
-        '201':
-          description: 商品建立成功
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Product'
-        '400':
-          description: 請求參數錯誤
-
-  /products/{productId}:
-    get:
-      summary: 取得單一商品
-      parameters:
-        - in: path
-          name: productId
-          required: true
-          schema:
-            type: string
-          description: 商品ID
-      responses:
-        '200':
-          description: 查詢成功
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Product'
-        '404':
-          description: 查無此商品
-    put:
-      summary: 更新商品
-      parameters:
-        - in: path
-          name: productId
-          required: true
-          schema:
-            type: string
-          description: 商品ID
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EditProductRequest'
-      responses:
-        '200':
-          description: 商品更新成功
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Product'
-        '404':
-          description: 查無此商品
-        '400':
-          description: 請求參數錯誤
-    delete:
-      summary: 刪除商品
-      parameters:
-        - in: path
-          name: productId
-          required: true
-          schema:
-            type: string
-          description: 商品ID
-      responses:
-        '204':
-          description: 商品已刪除
-        '404':
-          description: 查無此商品
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderDetail'
 components:
   schemas:
-    CreateOrderRequest:
+    OrderItemOutput:
       type: object
-      required:
-        - userId
-        - items
-      properties:
-        userId:
-          type: string
-          description: 用戶ID
-        items:
-          type: array
-          description: 訂單明細
-          items:
-            $ref: '#/components/schemas/OrderItemInput'
-        description:
-          type: string
-          description: 備註
-    OrderItemInput:
-      type: object
-      required:
-        - id
-        - productId
-        - name
-        - quantity
-        - price
       properties:
         id:
           type: string
-          description: 訂單項目ID
         productId:
           type: string
-          description: 商品ID
         name:
           type: string
-          description: 商品名稱
         quantity:
           type: integer
-          description: 數量
         price:
-          type: integer
-          description: 價格
+          type: number
+      required: [id, productId, name, quantity, price]
+    OrderStatus:
+      type: string
+      enum:
+        - 已點餐
+        - 已確認訂單
+        - 製作中
+        - 可取餐
+        - 已取餐完成
+        - 已取消
+        - 製作失敗
+        - 異常
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+        code:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+      required: [id, code, name, description, price]
+    ProductValidationError:
+      type: array
+      items:
+        type: string
+    CreateOrderRequest:
+      type: object
+      properties:
+        userId:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItemOutput'
+        description:
+          type: string
+          nullable: true
+      required: [userId, items]
     CreateOrderResponse:
       type: object
       properties:
@@ -397,184 +166,31 @@ components:
         description:
           type: string
         status:
-          type: string
+          $ref: '#/components/schemas/OrderStatus'
         totalAmount:
-          type: integer
+          type: number
         createdAt:
           type: string
           format: date-time
-    OrderItemOutput:
-      type: object
-      properties:
-        id:
-          type: string
-        productId:
-          type: string
-        name:
-          type: string
-        quantity:
-          type: integer
-        price:
-          type: integer
+      required: [orderId, userId, items, status, totalAmount, createdAt]
     OrderDetail:
-      allOf:
-        - $ref: '#/components/schemas/CreateOrderResponse'
-    OrderListResponse:
-      type: object
-      properties:
-        orders:
-          type: array
-          description: 訂單列表
-          items:
-            $ref: '#/components/schemas/OrderSummary'
-        total:
-          type: integer
-          description: 符合條件的訂單總數
-        hasMore:
-          type: boolean
-          description: 是否還有更多訂單
-    OrderSummary:
       type: object
       properties:
         orderId:
           type: string
-          description: 訂單ID
         userId:
           type: string
-          description: 使用者ID
-        description:
-          type: string
-          description: 訂單描述
-        status:
-          type: string
-          description: 訂單狀態
-        totalAmount:
-          type: integer
-          description: 訂單總金額
         items:
           type: array
-          description: 訂單明細（含數量與價格）
           items:
             $ref: '#/components/schemas/OrderItemOutput'
-        createdAt:
+        description:
           type: string
-          format: date-time
-          description: 建立時間
-    OrderStatusResponse:
-      type: object
-      properties:
-        orderId:
-          type: string
-          description: 訂單ID
         status:
-          type: string
-          description: 更新後的訂單狀態
-          enum:
-            - "已點餐"
-            - "已確認訂單"
-            - "製作中"
-            - "可取餐"
-            - "已取餐完成"
-            - "已取消"
-            - "失敗"
-        updatedAt:
-          type: string
-          format: date-time
-          description: 更新時間
-        message:
-          type: string
-          description: 狀態變更訊息
-    EditOrderRequest:
-      type: object
-      properties:
-        items:
-          type: array
-          description: 更新後的訂單明細
-          items:
-            $ref: '#/components/schemas/OrderItemInput'
-        description:
-          type: string
-          description: 更新後的備註
-      required:
-        - items
-    # 商品相關 schema
-    Product:
-      type: object
-      properties:
-        id:
-          type: string
-          description: 商品ID
-        name:
-          type: string
-          description: 商品名稱
-        description:
-          type: string
-          description: 商品描述
-        price:
-          type: integer
-          description: 商品價格
-        code:
-          type: string
-          description: 商品代碼
-        isActive:
-          type: boolean
-          description: 是否啟用
+          $ref: '#/components/schemas/OrderStatus'
+        totalAmount:
+          type: number
         createdAt:
           type: string
           format: date-time
-          description: 建立時間
-        updatedAt:
-          type: string
-          format: date-time
-          description: 更新時間
-    ProductListResponse:
-      type: object
-      properties:
-        products:
-          type: array
-          description: 商品列表
-          items:
-            $ref: '#/components/schemas/Product'
-        total:
-          type: integer
-          description: 符合條件的商品總數
-        hasMore:
-          type: boolean
-          description: 是否還有更多商品
-    CreateProductRequest:
-      type: object
-      required:
-        - name
-        - description
-        - price
-      properties:
-        name:
-          type: string
-          description: 商品名稱
-        description:
-          type: string
-          description: 商品描述
-        price:
-          type: integer
-          description: 商品價格
-        code:
-          type: string
-          description: 商品代碼（可選）
-    EditProductRequest:
-      type: object
-      properties:
-        name:
-          type: string
-          description: 商品名稱
-        description:
-          type: string
-          description: 商品描述
-        price:
-          type: integer
-          description: 商品價格
-        code:
-          type: string
-          description: 商品代碼（可選）
-        isActive:
-          type: boolean
-          description: 是否啟用
+      required: [orderId, userId, items, status, totalAmount, createdAt]

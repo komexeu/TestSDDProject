@@ -1,12 +1,21 @@
-openapi: 3.0.3
+openapi: 3.0.0
 info:
-  title: 後台商品管理 API
+  title: 商品管理 API
+  description: 商品管理功能的 OpenAPI 文件
   version: 1.0.0
 servers:
-  - url: /api
+  - url: http://localhost:3000
+    description: 本地開發伺服器
+tags:
+  - name: Product
+    description: 商品相關 API
+security:
+  - {}
 paths:
   /products:
     post:
+      tags:
+        - Product
       summary: 新增商品
       requestBody:
         required: true
@@ -21,8 +30,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Product'
+        '400':
+          description: 請求格式錯誤
+        '500':
+          description: 伺服器錯誤
   /products/list:
     get:
+      tags:
+        - Product
       summary: 查詢商品列表
       parameters:
         - name: name
@@ -51,8 +66,14 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Product'
+        '404':
+          description: 找不到商品
+        '500':
+          description: 伺服器錯誤
   /products/{id}:
     put:
+      tags:
+        - Product
       summary: 編輯商品
       parameters:
         - name: id
@@ -73,7 +94,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Product'
+        '400':
+          description: 請求格式錯誤
+        '404':
+          description: 找不到商品
+        '500':
+          description: 伺服器錯誤
     delete:
+      tags:
+        - Product
       summary: 刪除商品
       parameters:
         - name: id
@@ -82,48 +111,60 @@ paths:
           schema:
             type: string
       responses:
-        '204':
-          description: 商品已刪除
+        '200':
+          description: 商品刪除成功
+        '404':
+          description: 找不到商品
+        '500':
+          description: 伺服器錯誤
 components:
   schemas:
-    CreateProductRequest:
-      type: object
-      required:
-        - name
-        - description
-        - price
-      properties:
-        name:
-          type: string
-        description:
-          type: string
-        price:
-          type: integer
-          minimum: 1
-    UpdateProductRequest:
-      type: object
-      properties:
-        name:
-          type: string
-        description:
-          type: string
-        price:
-          type: integer
-          minimum: 1
     Product:
       type: object
       properties:
         id:
           type: string
+        code:
+          type: string
         name:
           type: string
         description:
           type: string
         price:
-          type: integer
+          type: number
+        isActive:
+          type: boolean
         createdAt:
           type: string
           format: date-time
-        updatedAt:
+      required: [id, code, name, description, price, isActive, createdAt]
+    ProductValidationError:
+      type: array
+      items:
+        type: string
+    CreateProductRequest:
+      type: object
+      properties:
+        name:
           type: string
-          format: date-time
+        description:
+          type: string
+        price:
+          type: number
+        code:
+          type: string
+      required: [name, description, price, code]
+    UpdateProductRequest:
+      type: object
+      properties:
+        productId:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        code:
+          type: string
+      required: [productId]

@@ -7,7 +7,7 @@
 
 2. UseCase 層
    - 只能依賴 `xxxService`
-   - 不可直接依賴 `xxxRepository`
+   - 可依賴 `xxxRepository` 但提出警告
 
 3. Service 層
    - 可依賴 `xxxRepository`
@@ -38,6 +38,6 @@ class GetOrderDetailQueryHandler {
 ## 提交前審查流程
 
 1. 所有程式碼提交前，必須執行 AI 架構審查。
-2. AI 會自動檢查“所有” controller/usecase/service 層的依賴關係，回報違規檔案與行數。
+2. 檢查 “所有” controller/usecase/service 層內的.ts 的依賴關係，回報違規檔案與行數，不可以亂省略。
 3. 若有違規，需修正後再提交。
 4. 如果沒問題再重新執行一次檢查驗證，確定真的沒問題才回答
