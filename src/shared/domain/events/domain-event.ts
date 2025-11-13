@@ -1,3 +1,4 @@
+import { injectable } from 'tsyringe';
 // 共用的領域事件介面
 export interface DomainEvent {
   readonly occurredOn: Date;
@@ -12,6 +13,7 @@ export interface DomainEventPublisher {
 }
 
 // 簡單的記憶體事件發布器實作
+@injectable()
 export class InMemoryDomainEventPublisher implements DomainEventPublisher {
   private handlers: Map<string, Array<(event: DomainEvent) => Promise<void>>> = new Map();
 

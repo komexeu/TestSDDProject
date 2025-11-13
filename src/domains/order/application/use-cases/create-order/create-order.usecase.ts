@@ -1,22 +1,24 @@
 import { OrderAppService } from '@domains/order/application/service/order-app-service';
 import { DomainEventPublisher } from '@shared/domain/events/domain-event';
 import { CreateOrderRequest, CreateOrderResponse } from './create-order.dto';
+import { injectable, inject } from 'tsyringe';
 
 /**
  * 建立訂單用例
  */
+@injectable()
 export class CreateOrderUseCase {
 	constructor(
 		private readonly orderAppService: OrderAppService,
-		private readonly eventPublisher: DomainEventPublisher
-	) {}
+		@inject('DomainEventPublisher') private readonly eventPublisher: DomainEventPublisher
+	) { }
 
 	/**
 	 * 執行建立訂單流程
 	 * @param request 建立訂單請求物件
 	 * @returns 建立訂單回應物件
 	 */
-		async execute(request: CreateOrderRequest): Promise<CreateOrderResponse> {
+	async execute(request: CreateOrderRequest): Promise<CreateOrderResponse> {
 		// 驗證 request
 		if (!request.userId || request.userId.trim().length === 0) {
 			throw new Error('User ID is required');
@@ -32,20 +34,20 @@ export class CreateOrderUseCase {
 		}
 		order.clearDomainEvents();
 		// 組裝回應 DTO
-			return {
-				orderId: order.id.value,
-				userId: order.userId.value,
-				items: order.items.map((item: any) => ({
-					id: item.id,
-					productId: item.productId,
-					name: item.name,
-					quantity: item.quantity,
-					price: item.price,
-				})),
-				description: order.description,
-				status: order.status.value,
-				totalAmount: order.totalAmount,
-				createdAt: order.createdAt,
-			};
+		return {
+			orderId: order.id.value,
+			userId: order.userId.value,
+			items: order.items.map((item: any) => ({
+				id: item.id,
+				productId: item.productId,
+				name: item.name,
+				quantity: item.quantity,
+				price: item.price,
+			})),
+			description: order.description,
+			status: order.status.value,
+			totalAmount: order.totalAmount,
+			createdAt: order.createdAt,
+		};
 	}
 }

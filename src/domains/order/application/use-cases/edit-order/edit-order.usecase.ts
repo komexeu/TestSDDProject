@@ -1,7 +1,8 @@
-import { OrderRepository } from '../../../domain/repositories/order-repository';
+import { IOrderRepository } from '../../../domain/repositories/order-repository';
 import { Order, OrderId, UserId } from '../../../domain/entities/order';
 import { OrderItem } from '../../../domain/value-objects/order-item';
 import { BusinessRuleError } from '@shared/application/exceptions';
+import { injectable, inject } from 'tsyringe';
 
 export interface EditOrderInput {
   orderId: string;
@@ -16,8 +17,9 @@ export interface EditOrderInput {
   }>;
 }
 
+@injectable()
 export class EditOrderUseCase {
-  constructor(private readonly orderRepository: OrderRepository) { }
+  constructor(@inject('OrderRepository') private readonly orderRepository: IOrderRepository) { }
 
   async execute(input: EditOrderInput): Promise<void> {
     const order = await this.orderRepository.findById(input.orderId);

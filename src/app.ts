@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import './scripts/register-di';
+import './auto-di';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { errorHandler, requestLogger } from '@interfaces/http/middleware/common';

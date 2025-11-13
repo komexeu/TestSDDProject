@@ -2,18 +2,19 @@ import { injectable, inject } from 'tsyringe';
 import { CreateOrderUseCase } from '@domains/order/application/use-cases/create-order/create-order.usecase';
 import { GetOrderDetailQueryHandler } from '@domains/order/application/queries/get-order-detail.query';
 import { GetOrderListQueryHandler } from '@domains/order/application/queries/get-order-list.query';
-import { OrderAppService } from '@domains/order/application/service/order-app-service';
-import { PrismaOrderRepository } from '@domains/order/infrastructure/repositories/prisma-order-repository';
+import { EditOrderUseCase } from '@domains/order/application/use-cases/edit-order/edit-order.usecase'
+import { OrderRepository } from '@domains/order/infrastructure/repositories/prisma-order-repository';
 import { DomainEventPublisher } from '@shared/domain/events/domain-event';
 import { Context } from 'hono';
 
 @injectable()
 export class OrderController {
   constructor(
-    @inject('OrderAppService') private readonly orderAppService: OrderAppService,
-    @inject('OrderRepository') private readonly orderRepository: PrismaOrderRepository,
+    @inject('CreateOrderUseCase') private readonly createOrderUseCase: CreateOrderUseCase,
+    @inject('EditOrderUseCase') private readonly editOrderUseCase: EditOrderUseCase,
+    @inject('OrderRepository') private readonly orderRepository: OrderRepository,
     @inject('DomainEventPublisher') private readonly eventPublisher: DomainEventPublisher
-  ) {}
+  ) { }
 
   async editOrder(c: Context) {
     try {
@@ -22,9 +23,7 @@ export class OrderController {
       const body = await c.req.json();
       // 允許 description, items
       const { description, items } = body;
-      const { EditOrderUseCase } = await import('@domains/order/application/use-cases/edit-order/edit-order.usecase');
-      const useCase = new EditOrderUseCase(this.orderRepository);
-      await useCase.execute({ orderId, userId, description, items });
+      await this.editOrderUseCase.execute({ orderId, userId, description, items });
       return c.json({ message: '訂單已更新' }, 200);
     } catch (error) {
       return c.json({ message: error instanceof Error ? error.message : 'Unknown error' }, 400);
@@ -34,8 +33,7 @@ export class OrderController {
   async createOrder(c: Context) {
     try {
       const body = await c.req.json();
-      const useCase = new CreateOrderUseCase(this.orderAppService, this.eventPublisher);
-      const result = await useCase.execute(body);
+      const result = await this.createOrderUseCase.execute(body);
       return c.json(result, 201);
     } catch (error) {
       return c.json({ message: error instanceof Error ? error.message : 'Unknown error' }, 400);
@@ -70,7 +68,7 @@ export class OrderController {
         userId,
         status,
       });
-      
+
       return c.json(result, 200);
     } catch (error) {
       return c.json({ message: error instanceof Error ? error.message : 'Unknown error' }, 500);

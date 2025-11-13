@@ -1,14 +1,14 @@
 import { injectable } from 'tsyringe';
 
 import { PrismaClient } from '@prisma/client';
-import { OrderRepository, FindAllOptions, FindAllResult } from '@domains/order/domain/repositories/order-repository';
+import { IOrderRepository, FindAllOptions, FindAllResult } from '@domains/order/domain/repositories/order-repository';
 import { Order as OrderDomain, OrderId, UserId } from '@domains/order/domain/entities/order';
 import { OrderItem } from '@domains/order/domain/value-objects/order-item';
 
 const prisma = new PrismaClient();
 
 @injectable()
-export class PrismaOrderRepository implements OrderRepository {
+export class OrderRepository implements IOrderRepository {
 
   async findById(id: string): Promise<OrderDomain | null> {
     const order = await prisma.order.findUnique({

@@ -46,9 +46,9 @@ export class InventoryOperationType extends ValueObject<string> {
   public static readonly DAMAGE = new InventoryOperationType('損壞');
   public static readonly INITIAL = new InventoryOperationType('初始化');
 
-  private static readonly VALID_OPERATIONS = [
-    '手動調整', '銷售', '補貨', '退貨', '損壞', '初始化'
-  ];
+  public static get VALID_OPERATIONS() {
+    return ['手動調整', '銷售', '補貨', '退貨', '損壞', '初始化'];
+  }
 
   constructor(value: string) {
     if (!value || value.trim().length === 0) {

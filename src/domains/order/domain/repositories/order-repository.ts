@@ -14,7 +14,7 @@ export interface FindAllResult {
 }
 
 // 訂單倉儲介面
-export interface OrderRepository {
+export interface IOrderRepository {
   findById(id: string): Promise<OrderDomain | null>;
   findByUserId(userId: string): Promise<OrderDomain[]>;
   findAll(options: FindAllOptions): Promise<FindAllResult>;

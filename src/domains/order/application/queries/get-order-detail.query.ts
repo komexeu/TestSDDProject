@@ -2,7 +2,7 @@
  * 查詢訂單明細 Query
  * Application Query 層，僅查詢，不發佈事件
  */
-import { PrismaOrderRepository } from '@domains/order/infrastructure/repositories/prisma-order-repository';
+import { OrderRepository } from '@domains/order/infrastructure/repositories/prisma-order-repository';
 
 export interface GetOrderDetailQuery {
   orderId: string;
@@ -24,7 +24,7 @@ export interface GetOrderDetailResult {
 }
 
 export class GetOrderDetailQueryHandler {
-  constructor(private readonly orderRepository: PrismaOrderRepository) {}
+  constructor(private readonly orderRepository: OrderRepository) {}
 
   /**
    * 查詢訂單明細

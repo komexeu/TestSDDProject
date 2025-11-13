@@ -8,7 +8,7 @@ import { injectable, inject } from 'tsyringe';
 import { DomainEventPublisher } from '@shared/domain/events/domain-event';
 import { Order, UserId } from '@domains/order/domain/entities/order';
 import { OrderItem } from '@domains/order/domain/value-objects/order-item';
-import { PrismaOrderRepository } from '@domains/order/infrastructure/repositories/prisma-order-repository';
+import { OrderRepository } from '@domains/order/infrastructure/repositories/prisma-order-repository';
 
 
 /**
@@ -48,7 +48,7 @@ export class OrderAppService {
    * @param eventBus 事件發佈器（目前僅用於型別說明）
    */
   constructor(
-    private readonly orderRepository: PrismaOrderRepository,
+    private readonly orderRepository: OrderRepository,
     @inject('DomainEventPublisher') private readonly eventPublisher: DomainEventPublisher
   ) {}
 

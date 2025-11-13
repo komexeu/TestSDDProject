@@ -2,7 +2,7 @@
  * 查詢訂單列表 Query
  * Application Query 層，僅查詢，不發佈事件
  */
-import { PrismaOrderRepository } from '@domains/order/infrastructure/repositories/prisma-order-repository';
+import { OrderRepository } from '@domains/order/infrastructure/repositories/prisma-order-repository';
 import { Order as OrderDomain } from '@domains/order/domain/entities/order';
 
 export interface GetOrderListQuery {
@@ -33,7 +33,7 @@ export interface GetOrderListResult {
 }
 
 export class GetOrderListQueryHandler {
-  constructor(private readonly orderRepository: PrismaOrderRepository) {}
+  constructor(private readonly orderRepository: OrderRepository) {}
 
   /**
    * 查詢訂單列表
