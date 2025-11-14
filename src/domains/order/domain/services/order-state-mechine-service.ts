@@ -24,8 +24,8 @@ export class OrderStateMachineService {
    * 驗證是否可以從目前狀態轉換到目標狀態
    */
   public static canTransition(from: OrderStatus, to: OrderStatus): boolean {
-  const allowed = OrderStateMachineService.ALLOWED_TRANSITIONS[from.value] || [];
-  return allowed.includes(to.value);
+    const allowed = OrderStateMachineService.ALLOWED_TRANSITIONS[from.value] || [];
+    return allowed.includes(to.value);
   }
   /**
    * 驗證訂單狀態轉換是否有效

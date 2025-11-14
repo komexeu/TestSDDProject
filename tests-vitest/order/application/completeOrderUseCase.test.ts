@@ -41,13 +41,13 @@ describe('CompleteOrderUseCase (integration)', () => {
     // 狀態流轉：已點餐→已確認訂單→製作中→可取餐
     await confirmOrderUseCase.execute(createdOrderId);
     let order = await orderRepository.findById(createdOrderId);
-    expect(order?.status.value).toBe('已確認訂單');
+  expect(order?.status.value).toBe(2);
     await startPreparationUseCase.execute(createdOrderId);
     order = await orderRepository.findById(createdOrderId);
-    expect(order?.status.value).toBe('製作中');
+  expect(order?.status.value).toBe(3);
     await markReadyForPickupUseCase.execute(createdOrderId);
     order = await orderRepository.findById(createdOrderId);
-    expect(order?.status.value).toBe('可取餐');
+  expect(order?.status.value).toBe(4);
   });
 
 
@@ -56,6 +56,6 @@ describe('CompleteOrderUseCase (integration)', () => {
     await useCase.execute(createdOrderId);
     // Assert
     const order = await orderRepository.findById(createdOrderId);
-    expect(order?.status.value).toBe('已取餐完成');
+  expect(order?.status.value).toBe(5);
   });
 });

@@ -37,6 +37,6 @@ describe('ConfirmOrderUseCase (integration)', () => {
     await useCase.execute(createdOrderId);
     // Assert
     const order = await orderRepository.findById(createdOrderId);
-  expect(order?.status.value).toBe('已確認訂單');
+  expect(order?.status.value).toBe(2);
   });
 });

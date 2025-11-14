@@ -37,6 +37,6 @@ describe('CancelOrderUseCase (integration)', () => {
     await useCase.execute(createdOrderId, 'user');
     // Assert
     const order = await orderRepository.findById(createdOrderId);
-    expect(order?.status.value).toBe('已取消');
+  expect(order?.status.value).toBe(6);
   });
 });

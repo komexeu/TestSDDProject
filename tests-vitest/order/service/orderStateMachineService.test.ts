@@ -34,7 +34,7 @@ describe('OrderStateMachineService', () => {
     const allowed: Record<string, string[]> = {
         [OrderStatus.已點餐.value]: [OrderStatus.已確認訂單.value, OrderStatus.已取消.value],
         [OrderStatus.已確認訂單.value]: [OrderStatus.製作中.value, OrderStatus.已取消.value],
-        [OrderStatus.製作中.value]: [OrderStatus.可取餐.value, OrderStatus.製作失敗.value],
+        [OrderStatus.製作中.value]: [OrderStatus.可取餐.value],
         [OrderStatus.可取餐.value]: [OrderStatus.已取餐完成.value],
         [OrderStatus.已取餐完成.value]: [],
         [OrderStatus.已取消.value]: [],

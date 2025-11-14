@@ -38,10 +38,10 @@ describe('FailOrderUseCase (integration)', () => {
     // 狀態流轉：已點餐→已確認訂單→製作中
     await confirmOrderUseCase.execute(createdOrderId);
     let order = await orderRepository.findById(createdOrderId);
-    expect(order?.status.value).toBe('已確認訂單');
+  expect(order?.status.value).toBe(2);
     await startPreparationUseCase.execute(createdOrderId);
     order = await orderRepository.findById(createdOrderId);
-    expect(order?.status.value).toBe('製作中');
+  expect(order?.status.value).toBe(3);
   });
 
 
@@ -51,6 +51,6 @@ describe('FailOrderUseCase (integration)', () => {
     await failUseCase.execute(createdOrderId, '測試失敗');
     // Assert
     order = await orderRepository.findById(createdOrderId);
-    expect(order?.status.value).toBe('製作失敗');
+  expect(order?.status.value).toBe(7);
   });
 });

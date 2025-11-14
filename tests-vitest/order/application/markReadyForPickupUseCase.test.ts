@@ -46,6 +46,6 @@ describe('MarkReadyForPickupUseCase (integration)', () => {
   await useCase.execute(createdOrderId);
   // Assert
   const order = await orderRepository.findById(createdOrderId);
-  expect(order?.status.value).toBe('可取餐');
+  expect(order?.status.value).toBe(4);
   });
 });
