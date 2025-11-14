@@ -9,6 +9,7 @@ import { MarkReadyForPickupUseCase } from '@domains/order/application/use-cases/
 import { GetOrderListQueryHandler } from '@domains/order/application/queries/get-order-list.query';
 import { EditOrderUseCase } from '@domains/order/application/use-cases/edit-order/edit-order.usecase'
 import { Context } from 'hono';
+import { MoveToNextStatusUseCase } from '@domains/order/application/use-cases/move-to-next-status/move-to-next-status.usecase';
 
 /**
  * OrderController
@@ -25,8 +26,24 @@ export class OrderController {
     @inject('StartPreparationUseCase') private readonly startPreparationUseCase: StartPreparationUseCase,
     @inject('MarkReadyForPickupUseCase') private readonly markReadyForPickupUseCase: MarkReadyForPickupUseCase,
     @inject('GetOrderDetailQueryHandler') private readonly getOrderDetailQueryHandler: GetOrderDetailQueryHandler,
-    @inject('GetOrderListQueryHandler') private readonly getOrderListQueryHandler: GetOrderListQueryHandler
+    @inject('GetOrderListQueryHandler') private readonly getOrderListQueryHandler: GetOrderListQueryHandler,
+    @inject('MoveToNextStatusUseCase') private readonly moveToNextStatusUseCase: MoveToNextStatusUseCase
   ) { }
+
+  /**
+   * 訂單狀態流轉到下一步
+   * @param c Hono Context
+   * @returns { message } 或 400
+   */
+  async moveToNextStatus(c: Context) {
+    try {
+      const orderId = c.req.param('orderId');
+      await this.moveToNextStatusUseCase.execute(orderId);
+      return c.json({ message: '訂單狀態已更新' }, 200);
+    } catch (error) {
+      return c.json({ message: error instanceof Error ? error.message : 'Unknown error' }, 400);
+    }
+  }
   /**
    * 查詢訂單狀態
    * @param c Hono Context

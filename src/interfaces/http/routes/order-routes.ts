@@ -86,5 +86,13 @@ export function createOrderRoutes(orderController: OrderController): Hono {
      */
     orderRoutes.post('/orders/:orderId/complete', (c) => orderController.completeOrder(c));
 
+
+    /**
+     * 訂單下一步狀態
+     * POST /orders/:orderId/next-status
+     * 櫃檯將訂單狀態流轉到下一步
+     */
+    orderRoutes.post('/orders/:orderId/next-status', (c) => orderController.moveToNextStatus(c));
+
     return orderRoutes;
 }

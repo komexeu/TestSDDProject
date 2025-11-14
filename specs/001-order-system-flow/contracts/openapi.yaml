@@ -77,6 +77,25 @@ paths:
       responses:
         '200':
           description: 訂單已完成
+  /orders/{orderId}/next-status:
+    post:
+      summary: 櫃檯將訂單狀態流轉到下一步
+      description: 將指定訂單的狀態流轉到下一個狀態（如製作中→可取餐）。
+      tags:
+        - Order
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 狀態流轉成功，回傳新狀態
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderStatus'
 components:
   schemas:
     OrderItemOutput:

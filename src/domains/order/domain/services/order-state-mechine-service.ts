@@ -12,7 +12,7 @@ export class OrderStateMachineService {
   public static readonly ALLOWED_TRANSITIONS: Record<OrderStatusCode, OrderStatusCode[]> = {
     [OrderStatusCode.已點餐]: [OrderStatusCode.已確認訂單, OrderStatusCode.已取消],
     [OrderStatusCode.已確認訂單]: [OrderStatusCode.製作中, OrderStatusCode.已取消],
-    [OrderStatusCode.製作中]: [OrderStatusCode.可取餐, OrderStatusCode.製作失敗],
+    [OrderStatusCode.製作中]: [OrderStatusCode.可取餐],
     [OrderStatusCode.可取餐]: [OrderStatusCode.已取餐完成],
     [OrderStatusCode.已取餐完成]: [],
     [OrderStatusCode.已取消]: [],

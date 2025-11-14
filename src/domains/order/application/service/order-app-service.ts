@@ -38,7 +38,7 @@ export class OrderAppService {
     // 建立 UserId 物件
     const userIdObj = new UserId(userId);
     // 建立 Order 聚合根
-  const order = Order.create(userIdObj, orderItems, description);
+    const order = Order.create(userIdObj, orderItems, description);
     // 儲存到資料庫
     await this.orderRepository.create(order);
     return order;
@@ -50,7 +50,18 @@ export class OrderAppService {
   constructor(
     private readonly orderRepository: OrderRepository,
     @inject('DomainEventPublisher') private readonly eventPublisher: DomainEventPublisher
-  ) {}
+  ) { }
+
+  /**
+  * 直接更新訂單狀態（只改 status 欄位，無驗證、無事件）
+  */
+  async updateStatus(orderId: string, statusCode: number): Promise<void> {
+    const { OrderStatus } = require('@domains/order/domain/value-objects/order-status');
+    const order = await this.orderRepository.findById(orderId);
+    if (!order) throw new Error('Order not found');
+    order.transitionTo(new OrderStatus(statusCode));
+    await this.orderRepository.edit(order);
+  }
 
   // 取消訂單
   /**
