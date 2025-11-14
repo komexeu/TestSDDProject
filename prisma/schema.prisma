@@ -15,8 +15,8 @@ model Order {
   userId      String
   /// 訂單描述
   description String @default("")
-  /// 訂單狀態（如：已點餐、可取餐、已取餐完成、已取消）
-  status      String
+  /// 訂單狀態（enum 數字代號，請參考 OrderStatusCode）
+  status      Int
   /// 訂單總金額（所有明細加總）
   totalAmount Int
   /// 建立時間

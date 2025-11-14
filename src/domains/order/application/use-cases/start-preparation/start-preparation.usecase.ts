@@ -1,18 +1,16 @@
 import { OrderAppService } from '@domains/order/application/service/order-app-service';
+import { injectable, inject } from 'tsyringe';
 import { DomainEventPublisher } from '@shared/domain/events/domain-event';
 
 /**
  * 用例：開始製作
  * 執行訂單狀態轉換為「製作中」，儲存並發佈事件
  */
+@injectable()
 export class StartPreparationUseCase {
-  /**
-   * @param orderAppService 應用服務，協調聚合根與倉儲
-   * @param eventPublisher 領域事件發佈器
-   */
   constructor(
-    private readonly orderAppService: OrderAppService,
-    private readonly eventPublisher: DomainEventPublisher
+    @inject('OrderAppService') private readonly orderAppService: OrderAppService,
+    @inject('DomainEventPublisher') private readonly eventPublisher: DomainEventPublisher
   ) {}
 
   /**

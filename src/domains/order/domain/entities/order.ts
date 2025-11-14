@@ -43,10 +43,13 @@ export class OrderStatusChangedEvent implements DomainEvent {
   readonly eventType: string = 'OrderStatusChanged';
   readonly aggregateId: string;
 
+  /**
+   * previousStatus/newStatus 皆為 OrderStatusCode (enum 數字)
+   */
   constructor(
     public readonly orderId: string,
-    public readonly previousStatus: string,
-    public readonly newStatus: string
+    public readonly previousStatus: number,
+    public readonly newStatus: number
   ) {
     this.occurredOn = new Date();
     this.aggregateId = orderId;

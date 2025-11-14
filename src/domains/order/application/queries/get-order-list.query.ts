@@ -18,6 +18,7 @@ export interface GetOrderListQuery {
 
 import { OrderItemOutput } from '../../../../models/OrderItemOutput';
 import { injectable } from 'tsyringe';
+import { getOrderStatusName } from '@domains/order/domain/value-objects/order-status';
 
 export interface GetOrderListResult {
   orders: Array<{
@@ -55,19 +56,19 @@ export class GetOrderListQueryHandler {
 
     return {
       orders: orders.map((order: OrderDomain) => ({
-        orderId: order.id.value,
-        userId: order.userId.value,
-        description: order.description,
-        status: order.status.value,
-        totalAmount: order.totalAmount,
-        items: order.items.map(item => ({
-          id: item.id,
-          productId: item.productId,
-          name: item.name,
-          quantity: item.quantity,
-          price: item.price
-        })),
-        createdAt: order.createdAt,
+          orderId: order.id.value,
+          userId: order.userId.value,
+          description: order.description,
+          status: getOrderStatusName(order.status.value),
+          totalAmount: order.totalAmount,
+          items: order.items.map(item => ({
+            id: item.id,
+            productId: item.productId,
+            name: item.name,
+            quantity: item.quantity,
+            price: item.price
+          })),
+          createdAt: order.createdAt,
       })),
       total,
       hasMore: offset + limit < total,

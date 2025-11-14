@@ -1,6 +1,7 @@
 import { OrderAppService } from '@domains/order/application/service/order-app-service';
 import { DomainEventPublisher } from '@shared/domain/events/domain-event';
 import { CreateOrderRequest, CreateOrderResponse } from './create-order.dto';
+import { getOrderStatusName } from '@domains/order/domain/value-objects/order-status';
 import { injectable, inject } from 'tsyringe';
 
 /**
@@ -34,20 +35,20 @@ export class CreateOrderUseCase {
 		}
 		order.clearDomainEvents();
 		// 組裝回應 DTO
-		return {
-			orderId: order.id.value,
-			userId: order.userId.value,
-			items: order.items.map((item: any) => ({
-				id: item.id,
-				productId: item.productId,
-				name: item.name,
-				quantity: item.quantity,
-				price: item.price,
-			})),
-			description: order.description,
-			status: order.status.value,
-			totalAmount: order.totalAmount,
-			createdAt: order.createdAt,
-		};
+			return {
+				orderId: order.id.value,
+				userId: order.userId.value,
+				items: order.items.map((item: any) => ({
+					id: item.id,
+					productId: item.productId,
+					name: item.name,
+					quantity: item.quantity,
+					price: item.price,
+				})),
+				description: order.description,
+				status: getOrderStatusName(order.status.value),
+				totalAmount: order.totalAmount,
+				createdAt: order.createdAt,
+			};
 	}
 }
