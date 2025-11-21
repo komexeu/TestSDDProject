@@ -104,3 +104,27 @@ model Admin {
   /// 管理員名稱
   name String
 }
+
+/// 推播記錄
+model PushLog {
+  /// 推播唯一編號
+  id         String   @id @default(uuid())
+  /// 用戶 ID
+  userId     String
+  /// 訂單 ID
+  orderId    String
+  /// 推播通道
+  channel    String   // e.g. 'LINE', 'SMS', 'EMAIL'
+  /// 推播訊息內容
+  message    String
+  /// 狀態
+  status     String   // 'SUCCESS', 'FAILED', 'RETRYING'
+  /// 錯誤訊息
+  error      String?
+  /// 重試次數
+  retryCount Int      @default(0)
+  /// 建立時間
+  createdAt  DateTime @default(now())
+  /// 更新時間
+  updatedAt  DateTime @updatedAt
+}

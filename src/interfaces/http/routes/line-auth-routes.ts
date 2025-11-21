@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { LineAuthController } from '../controllers/line-auth-controller';
+import { LineAuthController } from '@interfaces/http/controllers/line-auth-controller';
 
 export function createAuthRoutes(lineAuthController : LineAuthController): Hono {
     const authRoutes = new Hono();

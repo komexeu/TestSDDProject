@@ -31,11 +31,11 @@ describe('OrderStateMachineService', () => {
         OrderStatus.製作失敗,
         OrderStatus.異常
     ];
-    const allowed: Record<string, string[]> = {
-        [OrderStatus.已點餐.value]: [OrderStatus.已確認訂單.value, OrderStatus.已取消.value],
-        [OrderStatus.已確認訂單.value]: [OrderStatus.製作中.value, OrderStatus.已取消.value],
-        [OrderStatus.製作中.value]: [OrderStatus.可取餐.value],
-        [OrderStatus.可取餐.value]: [OrderStatus.已取餐完成.value],
+    const allowed: Record<string, OrderStatus[]> = {
+        [OrderStatus.已點餐.value]: [OrderStatus.已確認訂單, OrderStatus.已取消],
+        [OrderStatus.已確認訂單.value]: [OrderStatus.製作中, OrderStatus.已取消],
+        [OrderStatus.製作中.value]: [OrderStatus.可取餐],
+        [OrderStatus.可取餐.value]: [OrderStatus.已取餐完成],
         [OrderStatus.已取餐完成.value]: [],
         [OrderStatus.已取消.value]: [],
         [OrderStatus.製作失敗.value]: [],
@@ -44,10 +44,10 @@ describe('OrderStateMachineService', () => {
 
     for (const from of allStatus) {
         for (const to of allowed[from.value] || []) {
-            it(`允許狀態轉換：${from.value} → ${to}`, () => {
+            it(`允許狀態轉換：${from.value} → ${to.value}`, () => {
                 const service = new OrderStateMachineService();
                 const order = createOrderWithStatus(from);
-                expect(() => service.validateTransition(order, allStatus.find(s => s.value === to)!)).not.toThrow();
+                expect(() => service.validateTransition(order, to)).not.toThrow();
             });
         }
     }
@@ -56,7 +56,7 @@ describe('OrderStateMachineService', () => {
     for (const from of allStatus) {
         for (const to of allStatus) {
             if (from.value === to.value) continue; // 跳過自己轉自己
-            const isAllowed = allowed[from.value]?.includes(to.value);
+            const isAllowed = allowed[from.value]?.includes(to);
             if (!isAllowed) {
                 it(`不允許狀態轉換：${from.value} → ${to.value}`, () => {
                     const service = new OrderStateMachineService();

@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { OrderController } from '../controllers/order-controller';
+import { OrderController } from '@interfaces/http/controllers/order-controller';
 import { OrderStatusCode } from '@domains/order/domain/value-objects/order-status';
 
 export function createOrderRoutes(orderController: OrderController): Hono {

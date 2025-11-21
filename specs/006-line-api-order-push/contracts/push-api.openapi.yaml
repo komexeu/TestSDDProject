@@ -1,0 +1,45 @@
+openapi: 3.0.3
+info:
+  title: LINE 推播服務 API
+  version: 0.1.0
+paths:
+  /push/line:
+    post:
+      summary: 發送 LINE 訂單狀態推播
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                  description: 用戶 ID
+                orderId:
+                  type: string
+                  description: 訂單 ID
+                message:
+                  type: string
+                  description: 推播訊息內容
+              required:
+                - userId
+                - orderId
+                - message
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                    nullable: true
+        '400':
+          description: 請求參數錯誤
+        '500':
+          description: 伺服器錯誤
